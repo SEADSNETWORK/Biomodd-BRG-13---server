@@ -1,0 +1,19 @@
+{
+    "port" : 2000,
+    "publicDirectory": "public/frontx/build",
+    "intro":{
+        "font": "The Edge",
+        "lc": 10,
+        "pa": 2,
+        "ma": 3,
+        "border": "green",
+        "color": "blue",
+        "text": "green"
+    },
+    "mongoUser" : "subtiv",
+    "mongoPass" : "Vklcw0APQZBZ1r0O",
+    "mongoDB"  : "schedulers",
+    "mongoIP" : "128.199.61.147",
+    "mongoPORT" : "27017"
+}
+
