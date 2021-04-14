@@ -1,7 +1,7 @@
-# LUCA SCHEDULER
-Luca scheduler is an internal app by LUCA school of arts. It was developed by Studio Subtiv - pieter [at] subtiv [dot] net
+# BIOMODD BRG 13
+Biomodd is a SEADS project, more information :  www.seads.network
 
 ## links
 - MongoDB cloud : https://cloud.mongodb.com/ 
-  - Account: gmail
+  - Account: gmail 
 
