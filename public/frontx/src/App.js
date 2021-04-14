@@ -7,25 +7,13 @@ import { createBrowserHistory } from 'history';
 import { useSelector, useDispatch } from "react-redux";
 import { ACTIONS as DATA_ACTIONS } from "./reducers/DataReducer"
 import sanityclient from './client';
-import Connectors from './components/connectors'
+
+// import Connectors from './components/connectors';
+import Logo from './assets/logo.svg'
 
 import './assets/fonts/'
-
-class BuilderTheme extends Theme {
-  constructor(){
-    super()
-    this.font = "OfficeCodePro"
-    this.sizes.normal = "1.3em"
-  }
-
-  get defaultFont(){
-    return `${super.defaultFont}font-weight: 400;`
-  }
-
-  get Title(){
-    return this.styled(super.Title)` font-weight: bold;`
-  }
-}
+import BuilderTheme from './services/Buildertheme'
+import Home from './components/Home'
 
 const DataHelper = () => {
   const data = useSelector(state => state.data);
@@ -48,18 +36,6 @@ const DataHelper = () => {
   )
 }
 
-const Home = ()=>{
-  const theme = new BuilderTheme();
-
-  return <theme.Container>
-    <br/><br/>
-    <theme.Wrapped>
-    <theme.Text>
-      Een schone toevalligheid
-    </theme.Text>
-  </theme.Wrapped>
-  </theme.Container>
-}
 
 const App =()=>{
   const history = createBrowserHistory()
@@ -71,17 +47,16 @@ const App =()=>{
       <Router history={history}>
         <span>
           <div style={{padding: "10px"}}>
-        <img src="https://www.luca-arts.be/themes/custom/epsenkaas_theme/logo.svg" style={{float: "left"}}/>
-        <div style={{fontSize: "200%"}}>
-          <theme.Text>
-              &nbsp;Reservator
-          </theme.Text>
-        </div>
+        <img src={Logo} style={{float: "left", width: "100px"}}/>
+        
+          <theme.Title style={{color: "white", fontSize: "4em"}}>
+              &nbsp;BIOMODD [BRG<sup>13</sup>]
+          </theme.Title>
+        
         </div>
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exacact path="/overview" component={OverviewPage} />
-              <Route exacact path="/connectors" component={Connectors} />
               <Route component={Home}/>
             </Switch>
         </span>
@@ -89,25 +64,5 @@ const App =()=>{
   </Provider>
   );
 }
-
-// function App() {
-//   let theme = new BuilderTheme();
-//   return (
-//     <div style={{fontWeight: "lighter"}}>
-//       hello
-//       <div style={{fontFamily: "Bluu Next"}}>
-//           Studio Subtiv
-//       </div>
-//       <theme.Wrapped>
-//         <theme.Text>
-//           hello
-//         </theme.Text>
-//         <theme.Title>
-//           hello
-//         </theme.Title>
-//       </theme.Wrapped>
-//     </div>
-//   );
-// }
 
 export default App;

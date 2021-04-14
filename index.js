@@ -1,18 +1,24 @@
-/**
- * GLOBALS
- */
-const express = require('express')
-var bodyParser = require('body-parser')
+// /**
+//  * GLOBALS
+//  */
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser')
 const path = require('path');
+const http = require('http');
+const server = http.createServer(app);
+const io = require('socket.io')(server);
 const config = require('./package.json');
 const settings = require('./settings.json');
 const logo = require('./src/logo').default(config, settings);
 const database = require('./src/database').default(settings);
 const cleanup = require('./src/cleanup').default();
 const testData = require('./testData.json');
+const { query } = require('express');
 
 // create application/json parser
 const jsonParser = bodyParser.json()
+
 
 
 database.connect()
@@ -21,76 +27,78 @@ database.connect()
     list();
 
     var latestdata = {};
+    /**
+     * SOOCKET SETUP
+     */
+    io.on('connection', (socket) => {
+        console.log('a user connected');
+        socket.on('disconnect', () => {
+          console.log('user disconnected');
+        });
+    
+        socket.on("/data", (query)=>{
+            console.log(query)
+
+            getData(query)
+            .then((result)=>{
+                socket.emit("/push", result);
+            })
+        })
+      });
+    
     
     /**
      * SERVER SETUP
      */
-    express()
+    app
     .use(express.static(path.join(__dirname, 'public/frontx/build/')))
-    .get('/register', (req, res)=>{
-        add();
-        console.log('registering')
-        console.log(req.query.key1)
-        res.send(req.query.key1)
-    })
-    .get('/cols', (req, res)=>{
-        res.send(getCols());
+    .get('/push', (req, res)=>{
+        const err = [];
+        const values = {};
+        settings.requiredFields.forEach((fieldname)=>{
+            if (! req.query[fieldname]){
+                err.push(`Field ${fieldname} is required`);
+            } else {
+                values[fieldname] = req.query[fieldname];
+            }
+        })
+
+        values.createdAt = new Date();
+
+        if (err.length == 0){
+            add(values)
+            res.send(`New data has been added added: ${JSON.stringify(values)} `)
+        } else {
+            res.send(err);
+        }
     })
     .get('/data', (req, res)=>{
-        getData(req.query.selector)
+        getData(req.query)
         .then((result)=>{
             res.send( result);
         })
     })
-    .get('/test', (req, res)=>{
-        res.send(latestdata);
-    })
-    .post('/trigger', jsonParser, function (req, res) {
-        let body = req.body;
-
-        if (body && body.object && body.object.service){
-
-            let name, firstName, studentNumber;
-
-            body.object.fields.forEach(({field, value})=>{
-                switch (field.slug) {
-                    case "last-name":   
-                        name = value;       
-                        break;
-                    case "first-name":   
-                        firstName = value;       
-                        break;
-                    case "student-number":   
-                        studentNumber = value;       
-                        break;
-                }
-            })
-
-            let values = {
-                _id:            body.object.id,
-                action:         body.action,
-                organization:   body.object.organization.name,
-                service:        body.object.service.name,
-                location:       body.object.service.location,
-                name, 
-                firstName, 
-                studentNumber, 
-                email:          body.object.email,
-                timezone:       body.object.timezone,
-                start:          new Date(body.object.start),
-                end:            new Date(body.object.end),
-                created:        new Date(body.object.date_created)
-            }
-            add(values);
-            latestdata = values;
-        }        
-
-        res.send('POST request to the homepage')
-    })
     .get('*', (req, res) => res.sendFile(path.join(__dirname+'/public/frontx/build/index.html')))
+
+    server
     .listen(process.env.PORT || settings.port, () => {
         logo();
     })
 }).catch(console.error)
 
+// const express = require('express');
+// const path = require('path');
+// const app = require('express')();
+// const http = require('http').Server(app);
+// const io = require('socket.io')(http);
+// const port = process.env.PORT || 2000;
 
+// app.use(express.static(path.join(__dirname, 'public/frontx/build/')))
+
+// io.on('connection', (socket) => {
+//   console.log("allo")
+// });
+
+// http.listen(port, () => {
+//   console.log(`Socket.IO server running at http://localhost:${port}/`);
+// });

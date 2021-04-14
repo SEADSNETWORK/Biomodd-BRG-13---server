@@ -1,7 +1,7 @@
 {
-  "name": "LUCA.SCHEDULER",
+  "name": "Biomoddbrgxiii",
   "version": "1.0.0",
-  "description": "LUCA.SCHEDULER is an internal tool of LUCA School of Arts",
+  "description": "BIOMODD IS A SEADS PROJECT",
   "engines": {
     "node": "12.x"
   },
@@ -11,9 +11,9 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.9",
-    "mongoose": "^5.9.25"
+    "mongoose": "^5.9.25",
+    "socket.io": "^4.0.1"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
@@ -30,6 +30,5 @@
     "internal"
   ],
   "author": "Pieter Steyaert",
-  "license": "Copyright Pieter Steyaert",
   "homepage": "https://bitbucket.org/subtivdev/builder#readme"
 }

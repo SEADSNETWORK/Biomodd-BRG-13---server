@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import "./theme.css"
 import Overview from './pages/overview'
-import {Grid as Grid_, Col as Col_, Row as Row_} from 'react-styled-flexboxgrid';
+export {Grid, Col, Row } from 'react-styled-flexboxgrid';
 /* 
     - TOAST
     - support multiple themes
@@ -40,9 +40,9 @@ class Theme {
         this.font = "American Typewriter"
 
         this.sizes = {
-            normal: "1.6em",
-            title: "3em",
-            subtitle: "2.5em"
+            normal: "1.2em",
+            title: "2em",
+            subtitle: "1.4em"
         }
 
         this.medias = {
@@ -141,19 +141,18 @@ class Theme {
     //     `
     // }
 
-    // get Title(){
-    //     return styled.div`
-    //         ${this.defaultFont}
-    //         font-size: ${this.sizes.title}; 
-    //         text-align: center;
-    //     `
-    // }
+    get Title(){
+        return styled.div`
+            ${this.defaultFont}
+            font-size: ${this.sizes.title}; 
+        `
+    }
 
-    // get SubTitle(){
-    //     return styled(this.Title)`
-    //         font-size: ${this.sizes.subtitle}; 
-    //     `
-    // }
+    get SubTitle(){
+        return styled(this.Title)`
+            font-size: ${this.sizes.subtitle}; 
+        `
+    }
 
     // /**
     //  * grid

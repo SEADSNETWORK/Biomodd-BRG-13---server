@@ -10,10 +10,12 @@
         "color": "blue",
         "text": "green"
     },
-    "mongoUser" : "subtiv",
-    "mongoPass" : "Vklcw0APQZBZ1r0O",
-    "mongoDB"  : "schedulers",
-    "mongoIP" : "128.199.61.147",
-    "mongoPORT" : "27017"
+    "mongoString" : "mongodb+srv://subtiv:Vklcw0APQZBZ1r0O@cluster0.lhm9q.mongodb.net/data?retryWrites=true&w=majority",
+    "requiredFields" : [
+        "author",
+        "device",
+        "sensor",
+        "value"
+    ]
 }
 
