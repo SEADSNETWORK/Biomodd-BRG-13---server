@@ -16,6 +16,9 @@
         "device",
         "sensor",
         "value"
-    ]
+    ],
+    "game" : {
+        "resolution" : 5
+    }
 }
 

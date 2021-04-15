@@ -19,7 +19,18 @@ const { query } = require('express');
 // create application/json parser
 const jsonParser = bodyParser.json()
 
+const setupGameWorld = ()=>{
+    const world = [];
+    for (let x = 0; x < settings.game.resolution; x++){
+        world[x] = [];
+        for (let y = 0; y < settings.game.resolution; y++){
+            world[x][y] = Math.random()*255;
+        }
+    }
+    return world;
+}
 
+const gameWorld = setupGameWorld();
 
 database.connect()
 .then(({client, list, add, getData, close})=>{
@@ -37,13 +48,44 @@ database.connect()
         });
     
         socket.on("/data", (query)=>{
-            console.log(query)
-
             getData(query)
             .then((result)=>{
                 socket.emit("/push", result);
             })
         })
+
+        socket.on("/push", (data)=>{
+            const err = [];
+            const values = {};
+            settings.requiredFields.forEach((fieldname)=>{
+                if (! req.query[fieldname]){
+                    err.push(`Field ${fieldname} is required`);
+                } else {
+                    values[fieldname] = req.query[fieldname];
+                }
+            })
+            values.createdAt = new Date();
+            if (err.length == 0){
+                add(values)
+            } else {
+                //error
+            }
+        })
+
+        socket.on("/gamesettings", ()=>{
+            socket.emit("/gamesettings", {world:gameWorld, ...settings.game});
+        })
+
+        socket.on("/gameMove", (positions)=>{
+            const [pos1, pos2] = positions;
+
+            const val = gameWorld[pos1[0]][pos1[1]];
+            gameWorld[pos1[0]][pos1[1]] = gameWorld[pos2[0]][pos2[1]];
+            gameWorld[pos2[0]][pos2[1]] = val;
+
+            io.emit("/gameUpdateWorld", gameWorld);
+        })
+
       });
     
     
