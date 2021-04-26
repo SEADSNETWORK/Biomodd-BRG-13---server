@@ -47,7 +47,7 @@ export const client = (dispatch)=>{
         environment.printstatus()
     } 
     // title, description, 
-    fetch("*[_type == 'biomoddnews']{title, description, images[]{title, description, 'image':image.asset->url}}").then((news)=>{
+    fetch("*[_type == 'biomoddnews']{title, description, images[]{title, description, 'image':image.asset->url}} | order(_createdAt desc)").then((news)=>{
         console.log(news)
         dispatch({ type: DATA_ACTIONS.SET_NEWS, news});
     })

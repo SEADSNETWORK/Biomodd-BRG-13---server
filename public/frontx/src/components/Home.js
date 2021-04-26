@@ -156,39 +156,6 @@ const Home = ()=>{
                 </>)
                 
                 : <theme.Text>L O A D I N G</theme.Text>}
-
-                <theme.SubTitle>
-                  Upload your preparatory materials
-                </theme.SubTitle>
-                <theme.Text>
-                  Please upload your sketches, discussions, audio-files,..., on Google Drive: 
-                  <a href="https://drive.google.com/drive/folders/1H-xTZU-UYXXCDeI5F2qslAUqaL8-KeHd?usp=sharing" target="_blank">
-                    link
-                  </a>
-                </theme.Text>
-                <br/><br/>
-                <theme.SubTitle>
-                  What questions should we ask the global Biomodd community? 
-                </theme.SubTitle>
-                <theme.Text>
-                In line with the current developments of the project, we want to gather statements from all of you in regards to the themes surrounding the Biomodd hyperproject and the Biomodd [BRG13] project. 
-
-                Therefore we want to give you to opportunity to submit a (series of) question(s) which can be bundled and curated before we sent them out to the entire Biomodd [BRG13] and worldwide Biomodd communities. 
-
-                We have currently around 40 people working on this project, and have worked together with around a 1000 different participants in this last decade; what are the questions that YOU want to ask them? 
-
-                The questions can be;
-                - Philosophical; in line with the themes behind Biomodd or Biomodd [BRG13]
-                - Personal; personal experiences when working on a Biomodd related project
-                - Thematic; in line with the ideas you are exploring in your team
-
-                We consider this exercise as an experiment to expand the co-creation methodology in a remote context.
-                <br/>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfMac3fGDBot62lg01fcGxjGuG2jcypcAiC0cGSquXklfWf8A/viewform" target="_blank">
-                    --> Google forms link
-                  </a>
-                </theme.Text>
-
               </theme.Container>
             </theme.Wrapped>
           </theme.Container>
