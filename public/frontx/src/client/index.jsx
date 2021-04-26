@@ -1,7 +1,7 @@
 import sanityClient from '@sanity/client'
 import envi from './environment'
 import {settings} from './connector_settings.json'
-// import { ACTIONS as DATA_ACTIONS } from "../reducers/DataReducer"
+import { ACTIONS as DATA_ACTIONS } from "../reducers/DataReducer"
 // import toast from '../services/toast'
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -10,6 +10,7 @@ const prevFetched = {};
 export const client = (dispatch)=>{
     const environment = envi();
     let _ = settings;
+    let news = [];
     const sc = sanityClient({
         projectId: _.projectId,
         dataset: _.dataset,
@@ -45,6 +46,13 @@ export const client = (dispatch)=>{
     if (environment.dev){
         environment.printstatus()
     } 
+    // title, description, 
+    fetch("*[_type == 'biomoddnews']{title, description, images[]{title, description, 'image':image.asset->url}}").then((news)=>{
+        console.log(news)
+        dispatch({ type: DATA_ACTIONS.SET_NEWS, news});
+    })
+
+    
 
     return {
         fetch,

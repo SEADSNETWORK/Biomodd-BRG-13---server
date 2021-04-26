@@ -4,10 +4,12 @@ import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import Input from './Input';
 import Game from './game_simple'
+import BlockContent from '@sanity/block-content-to-react';
 
 
 const Home = ()=>{
     const theme = useSelector(state => state.data.theme);
+    const news = useSelector(state => state.data.news);
     const [author, setAuthor] = useState("");
     const [device, setDevice] = useState('');
     const [sensor, setSensor] = useState('');
@@ -107,7 +109,7 @@ const Home = ()=>{
                     --> Game concept master
                   </a>
                   <br/><br/>
-                  {gameSettings?<Game socket={socket} resolution={gameSettings.resolution} world={gameSettings.world} /> : "LOADING" }
+                  {/* {gameSettings?<Game socket={socket} resolution={gameSettings.resolution} world={gameSettings.world} /> : "LOADING" } */}
                   
                 </theme.Text>
               </theme.Container>
@@ -125,6 +127,35 @@ const Home = ()=>{
                     NEWS
                 </theme.Title>
                 <br/>
+
+                {news?
+
+                news.map(({title, description, images})=><>
+                  <theme.SubTitle>
+                    {title}
+                  </theme.SubTitle>
+                  <theme.Text>
+                      <BlockContent blocks={description} />
+                  </theme.Text>
+                  {(images && images.length)?
+                  images.map(({title, description, image})=><>
+                      <theme.Text>
+                        <b>
+                        {title}
+                        </b>
+                      </theme.Text>
+                      <img src={image} alt={title} style={{width: "100%"}} />
+                      <theme.Text>
+                        <i>
+                        <BlockContent blocks={description} />
+                        </i>
+                      </theme.Text>
+                  </>)
+                  : null}
+                  <br/>
+                </>)
+                
+                : <theme.Text>L O A D I N G</theme.Text>}
 
                 <theme.SubTitle>
                   Upload your preparatory materials
