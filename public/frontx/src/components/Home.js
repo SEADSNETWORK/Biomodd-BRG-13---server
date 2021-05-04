@@ -3,9 +3,8 @@ import { Grid, Col, Row} from '../theme'
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import Input from './Input';
-import Game from './game_simple'
+import Game from './spectrum'
 import BlockContent from '@sanity/block-content-to-react';
-
 
 const Home = ()=>{
     const theme = useSelector(state => state.data.theme);
@@ -26,7 +25,6 @@ const Home = ()=>{
         socket.emit("/gamesettings");
       }
     })
-
 
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"){
         socket = io("http://localhost:2200/", { transports: ["websocket"] });
@@ -109,7 +107,7 @@ const Home = ()=>{
                     --> Game concept master
                   </a>
                   <br/><br/>
-                  {/* {gameSettings?<Game socket={socket} resolution={gameSettings.resolution} world={gameSettings.world} /> : "LOADING" } */}
+                  {gameSettings?<Game socket={socket} /> : "LOADING" }
                   
                 </theme.Text>
               </theme.Container>
