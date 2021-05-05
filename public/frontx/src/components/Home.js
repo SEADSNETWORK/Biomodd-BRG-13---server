@@ -3,7 +3,7 @@ import { Grid, Col, Row} from '../theme'
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import Input from './Input';
-import Game from './spectrum'
+import Game from '../components/spectrum'
 import BlockContent from '@sanity/block-content-to-react';
 
 const Home = ()=>{
