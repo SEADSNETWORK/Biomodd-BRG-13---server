@@ -3,6 +3,7 @@ import Sketch from "react-p5";
 import {getPointOnCircle} from './aux'
 import Plant from './plant'
 import Light from './light'
+import Mirror from "./mirror";
 
 // ===============================
 // ===============================
@@ -16,6 +17,9 @@ export default ({socket}) => {
     // globals
     const lights        = new Map();
     const plants        = [];
+
+    const mirrors        = [];
+
 
     // -- keep track of all objects we want to draw 
     // --- expects they implemented a draw(p5) method
@@ -37,10 +41,17 @@ export default ({socket}) => {
     };
 
     const plantSettings = {
-        amount: 2,
+        amount: 1,
         size: 40,
         color: "darkgreen",
         alternativeColor: "lightgreen"
+    }
+
+    const mirrorSettings = {
+        amount: 3,
+        size: 60,
+        color: "magenta",
+        alternativeColor: "0f0"
     }
     
     // ===============================
@@ -79,6 +90,13 @@ export default ({socket}) => {
             toInteract.push(plants[i]);
         }
 
+
+        for (let i = 0; i < mirrorSettings.amount; i++){
+            mirrors[i] = new Mirror({location: getRandomPoint(p5), ...mirrorSettings});
+            toDraw.push(mirrors[i]);
+            toInteract.push(mirrors[i]);
+        }
+
         // setup sockets
         socket.on("/gameUpdateWorld", (gameWorld)=>{
             // world = gameWorld;
@@ -92,6 +110,8 @@ export default ({socket}) => {
 	const draw = (p5) => {
 		p5.background(settings.background);
         toDraw.forEach(td=>td.draw(p5));
+        mirrors.forEach(mr=>mr.checkSegments(lights))
+
 	};
 
     // ===============================

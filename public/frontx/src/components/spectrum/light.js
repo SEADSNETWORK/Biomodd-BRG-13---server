@@ -19,24 +19,61 @@ class Handle extends InteractiveObject {
     }
 }
 
+
+class Segment {
+    constructor(p1_x, p1_y, p2_x, p2_y, color){
+        this.p1_x = p1_x;
+        this.p1_y = p1_y;
+        this.p2_x = p2_x;
+        this.p2_y = p2_y;
+        this.color = color;
+    }
+}
+
+
 class Beam {
-    constructor(origin, direction, color){
+
+    createSegmentZero(p5){
+        const p2 = p5.createVector(0, 0).set(this.direction);
+        p2.mult(p5.width);
+        p2.add(this.origin);
+        this.segments[0]= new Segment(p2.x, p2.y, this.origin.x, this.origin.y, this.color);
+    }
+
+    addSegment(i, x, y, angle, color){
+        console.log(this.segments);
+        let segLength = this.segments.length;
+
+        this.segments.splice(i+1, segLength-(i));
+        // calc enddddddddd
+        let x2 = Math.cos(angle)*800;
+        let y2 = Math.sin(angle)*800;
+        this.segments[this.segments.length] = new Segment(x, y, x2, y2, color);
+
+    }
+
+    constructor(origin, direction, color, p5){
         this.origin = origin;
         this.direction = direction;
         this.color = color;
+        this.segments = []
+        this.createSegmentZero(p5);
     }
 
-    setDirection(direction){
+    setDirection(direction, p5){
         this.direction = direction;
+        this.createSegmentZero(p5);
+        //this.segments[0].direction = direction;
     }
 
     draw(p5){
         p5.noFill();
-        p5.stroke(this.color);
-        const p2 = p5.createVector(0, 0).set(this.direction);
-        p2.mult(p5.width);
-        p2.add(this.origin);
-        p5.line(this.origin.x, this.origin.y, p2.x, p2.y);
+        for (let i=0; i<this.segments.length; i++){
+
+
+        p5.stroke(this.segments[i].color);
+        p5.line(this.segments[i].p1_x, this.segments[i].p1_y, this.segments[i].p2_x, this.segments[i].p2_y);
+        }
     }
 }
 
@@ -48,7 +85,7 @@ class Light extends InteractiveObject {
         this.strokeWeight = strokeWeight;
 
         this.handle = new Handle(p5.createVector(0, 0), 10, this.color);
-        this.beam = new Beam(this.location, this.getDirection(p5), color);
+        this.beam = new Beam(this.location, this.getDirection(p5), color, p5);
         const r = ()=>p5.random(-this.handleOffset(), this.handleOffset());
         this.moveHandle(p5, p5.createVector().set(this.location).add(p5.createVector(r(), r())))
         
@@ -103,7 +140,7 @@ class Light extends InteractiveObject {
         // add to center
         diff.add(this.location);
         this.handle.location.set(diff);
-        this.beam.setDirection(this.getDirection(p5));
+        this.beam.setDirection(this.getDirection(p5), p5);
     }
 
     // ---- I/O stuff 
