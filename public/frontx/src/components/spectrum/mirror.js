@@ -11,20 +11,20 @@ class Mirror extends InteractiveObject {
         this.color = color;
         this.alternativeColor = alternativeColor;
         this.direction = direction;
-        this.widthHeightRatio = 1/4;
         this.rotation = 0;
+        this.strokeWeight = 5;
     }
     isOver(loc){
         var x = loc.x
         var y = loc.y
-        return this.location.x <= x && x <= this.location.x + this.size* this.widthHeightRatio &&
+        return this.location.x <= x && x <= this.location.x + this.strokeWeight &&
             this.location.y <= y && y <= this.location.y + this.size;
     }
 
 
 
     checkLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
-        // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
+        // if the lines intersect, the result contains the x and y of the intersection and boolean for whether line segment contains the point
         var denominator, a, b, numerator1, numerator2, result = {
             inter: false,
             x: null,
@@ -65,7 +65,7 @@ class Mirror extends InteractiveObject {
                 y: y,
             };
             var p2 = {
-                x: x + this.size*this.widthHeightRatio,
+                x: x + this.strokeWeight,
                 y: y,
             };
             var p3 = {
@@ -73,15 +73,15 @@ class Mirror extends InteractiveObject {
                 y: y + this.size,
             };
             var p4 = {
-                x: x + this.size*this.widthHeightRatio,
+                x: x + this.strokeWeight,
                 y: y + this.size,
             };
 
             var lines = [];
-            //lines[0] = [p1,p2];
-            lines[0] = [p2,p4];
-            //lines[2] = [p3,p4];
-            lines[1] = [p1,p3];
+
+            lines[0] =  [p1,p3];    // left
+            lines[1] = [p2,p4];   // right
+
             return lines;
 
     }
@@ -94,23 +94,28 @@ class Mirror extends InteractiveObject {
                 for (let j = 0; j < light.beam.segments.length; j++) {
                     var segment = light.beam.segments[j];
                     //console.log(rectLines);
-                    var inter = this.checkLineIntersection(rectLine.[0].x, rectLine.[0].y, rectLine.[1].x, rectLine.[1].y, segment.p1_x, segment.p1_y, segment.p2_x, segment.p2_y);
+                    var inter = this.checkLineIntersection(rectLine[0].x, rectLine[0].y, rectLine[1].x, rectLine[1].y, segment.p1_x, segment.p1_y, segment.p2_x, segment.p2_y);
 
                     if (inter.inter) {
-                        //console.log("inter");
-                        var angleRotation = this.rotation;
-                        /*if (i % 2 == 0) {
-                            angleRotation += 180* 3.14/180;
-                        }
-                        */
 
-                        if (inter.x = rectLines[1][0].x) {
+                        var angleRotation = this.rotation;
+
+
+                        //if (inter.x = rectLines[0][0].x) {
+                        if (segment.p1_x < rectLines[0][0].x ) {    // entering from left
 
                             let side1 = segment.p1_x - inter.x;
                             let side2 = segment.p1_y - inter.y;
                             var angle = Math.atan(side2 / side1);
                             angle =  Math.PI - angle;
-                            console.log(angle);
+
+                            light.beam.addSegment(j, inter.x, inter.y, angle, light.color);
+                        } else {   // entering from right
+                            let side1 = segment.p1_x - inter.x;
+                            let side2 = segment.p1_y - inter.y;
+                            var angle = Math.atan(side2 / side1);
+                            angle =  2*Math.PI - angle;
+
                             light.beam.addSegment(j, inter.x, inter.y, angle, light.color);
                         }
                     }
@@ -124,13 +129,13 @@ class Mirror extends InteractiveObject {
     }
 
     draw(p5){
-        p5.noStroke();
+        //p5.noStroke();
         if (this.state === IO_STATE.UNSELECTED || this.state === IO_STATE.HOVERING){
-            p5.fill(this.color);
+            p5.stroke(this.color);
         } else {
             if (this.state === IO_STATE.DRAGGED ){
-                this.location.x = p5.mouseX - this.size*this.widthHeightRatio/2;
-                this.location.y = p5.mouseY - this.size/2;
+                this.location.x = p5.mouseX ;
+                this.location.y = p5.mouseY ;
             }
             p5.fill(this.alternativeColor);
         }
@@ -140,7 +145,9 @@ class Mirror extends InteractiveObject {
             size+=Math.sin(p5.millis())*2;
         }
 
-        p5.rect(this.location.x, this.location.y, size*this.widthHeightRatio, size);
+        p5.line(this.location.x, this.location.y, this.location.x, this.location.y+size);
+        p5.strokeWeight(this.strokeWeight);
+        //p5.stroke(200);
     }
 }
 

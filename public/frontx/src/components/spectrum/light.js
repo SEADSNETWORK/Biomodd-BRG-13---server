@@ -37,17 +37,16 @@ class Beam {
         const p2 = p5.createVector(0, 0).set(this.direction);
         p2.mult(p5.width);
         p2.add(this.origin);
-        this.segments[0]= new Segment(p2.x, p2.y, this.origin.x, this.origin.y, this.color);
+        this.segments[0]= new Segment(this.origin.x, this.origin.y, p2.x, p2.y, this.color);
     }
 
     addSegment(i, x, y, angle, color){
-        console.log(this.segments);
-        let segLength = this.segments.length;
-
-        this.segments.splice(i+1, segLength-(i));
+        var lastSeg  = this.segments[i];
+        this.segments.splice(i);
         // calc enddddddddd
         let x2 = Math.cos(angle)*800;
         let y2 = Math.sin(angle)*800;
+        this.segments[this.segments.length] = new Segment( lastSeg.p1_x, lastSeg.p1_y, x, y, color);
         this.segments[this.segments.length] = new Segment(x, y, x2, y2, color);
 
     }
