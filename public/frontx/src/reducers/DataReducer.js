@@ -3,7 +3,8 @@ export const ACTIONS = Object.freeze({
     SET_NAV_OPEN: Symbol('data/navopen'),
     SET_THEME: Symbol('data/theme'),
     SET_THEMES: Symbol('data/themes'),
-    SET_NEWS: Symbol('data/news')
+    SET_NEWS: Symbol('data/news'),
+    SET_EVENTS: Symbol('data/cal')
 });
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
   theme: null,
   themes: null,
   news: null,
+  events: null
 };
 
 export default (state = initialState, action) => {
@@ -27,6 +29,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         news: action.news
+      };
+    }
+    case ACTIONS.SET_EVENTS: {
+      return {
+        ...state,
+        events: action.events
       };
     }
     case ACTIONS.SET_NAV_OPEN: {

@@ -48,11 +48,12 @@ export const client = (dispatch)=>{
     } 
     // title, description, 
     fetch("*[_type == 'biomoddnews']{title, description, images[]{title, description, 'image':image.asset->url}} | order(_createdAt desc)").then((news)=>{
-        console.log(news)
         dispatch({ type: DATA_ACTIONS.SET_NEWS, news});
     })
 
-    
+    fetch("*[_type == 'biomoddevent']{description, title, moment, available}|order(moment asc)").then((events)=>{
+        dispatch({type: DATA_ACTIONS.SET_EVENTS, events});
+    })
 
     return {
         fetch,

@@ -7,9 +7,12 @@ import { createBrowserHistory } from 'history';
 import { useSelector, useDispatch } from "react-redux";
 import { ACTIONS as DATA_ACTIONS } from "./reducers/DataReducer"
 import sanityclient from './client';
+import Server from './components/server'
+import Nav from './components/nav'
 
-// import Connectors from './components/connectors';
-import Logo from './assets/logo.svg'
+import { Grid, Col, Row} from './theme'
+import Game from './components/game'
+
 
 import './assets/fonts/'
 import BuilderTheme from './services/Buildertheme'
@@ -45,21 +48,27 @@ const App =()=>{
     <Provider store={Store}>
     <DataHelper />
       <Router history={history}>
+
+        <Grid>
+
+        
+
+        <Nav />
+        
+      
         <span>
-          <div style={{padding: "10px"}}>
-        <img src={Logo} style={{float: "left", width: "100px"}}/>
-        
-          <theme.Title style={{color: "white", fontSize: "4em"}}>
-              &nbsp;BIOMODD [BRG<sup>13</sup>]
-          </theme.Title>
-        
-        </div>
+       
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route exacact path="/overview" component={OverviewPage} />
+              <Route exact path="/overview" component={OverviewPage} />
+              <Route exact path="/server" component={Server} />
+              <Route exact path="/game" component={Game} />
+              
               <Route component={Home}/>
             </Switch>
         </span>
+
+        </Grid>
       </Router>
   </Provider>
   );
