@@ -4,7 +4,8 @@ export const ACTIONS = Object.freeze({
     SET_THEME: Symbol('data/theme'),
     SET_THEMES: Symbol('data/themes'),
     SET_NEWS: Symbol('data/news'),
-    SET_EVENTS: Symbol('data/cal')
+    SET_EVENTS: Symbol('data/cal'),
+    SET_FAQS: Symbol('data/faq')
 });
 
 const initialState = {
@@ -13,7 +14,8 @@ const initialState = {
   theme: null,
   themes: null,
   news: null,
-  events: null
+  events: null,
+  faqs: null
 };
 
 export default (state = initialState, action) => {
@@ -23,6 +25,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         client: action.client
+      };
+    }
+    case ACTIONS.SET_FAQS: {
+      return {
+        ...state,
+        faqs: action.faqs
       };
     }
     case ACTIONS.SET_NEWS: {

@@ -55,6 +55,10 @@ export const client = (dispatch)=>{
         dispatch({type: DATA_ACTIONS.SET_EVENTS, events});
     })
 
+    fetch("*[_type == 'faq']{title, description}").then((faqs)=>{
+        dispatch({type: DATA_ACTIONS.SET_FAQS, faqs})
+    })
+
     return {
         fetch,
         environment,

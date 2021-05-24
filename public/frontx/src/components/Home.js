@@ -12,6 +12,7 @@ const Home = ()=>{
     const theme = useSelector(state => state.data.theme);
     const news = useSelector(state => state.data.news);
     const events = useSelector(state=>state.data.events)
+    const faqs = useSelector(state=>state.data.faqs)
     
     
     
@@ -90,13 +91,41 @@ const Home = ()=>{
             <theme.Wrapped>
               <theme.Container>
                 <theme.Title >
+                    Frequently Asked Questions
+                </theme.Title>
+                <br/>
+
+                {faqs?
+                  faqs.map(({title, description})=><theme.Text key={title}>
+                    <b>
+                      {title}
+                    </b> <br/>
+                    <BlockContent blocks={description} />
+                  </theme.Text>)
+                : <theme.Text>L O A D I N G</theme.Text>}
+
+                <br/>
+                             
+
+              </theme.Container>
+            </theme.Wrapped>
+          </theme.Container>
+
+          <theme.Container>
+            <br/><br/>
+            <theme.Wrapped>
+              <theme.Container>
+                <theme.Title >
                     EVENTS
                 </theme.Title>
                 <br/>
 
                 {events?
                   getEvents(events.filter((e)=>{
-                    return new Date(e.moment) >= new Date();
+                    const today = new Date()
+                    const yesterday = new Date(today)
+                    yesterday.setDate(yesterday.getDate() - 1)
+                    return new Date(e.moment) >= yesterday;
                   }))                
                 : <theme.Text>L O A D I N G</theme.Text>}
 
@@ -109,21 +138,19 @@ const Home = ()=>{
 
                 {events?
                   getEvents(events.filter((e)=>{
-                    return new Date(e.moment) < new Date();
+                    const today = new Date()
+                    const yesterday = new Date(today)
+                    yesterday.setDate(yesterday.getDate() - 1)
+                    return new Date(e.moment) < yesterday;
                   }))                
-                : null}
-
-
-                
-                  
-                
-
-                
+                : null}                
 
               </theme.Container>
             </theme.Wrapped>
           </theme.Container>
         </Col>
+
+        
 
         
 
