@@ -1,6 +1,6 @@
 import {IO_STATE, InteractiveObject} from './interactiveObject.js'
 
-import {getPointLineDistance} from './aux'
+import {distToSegment} from './aux'
 
 // ===============================
 //      P L A N T
@@ -24,11 +24,13 @@ class Plant extends InteractiveObject {
         for (let light of lights.values()) {
             for (let j = 0; j < light.beam.segments.length; j++) {
                 var segment = light.beam.segments[j];
-                let line = [];
-                line[0] = [segment.p1_x, segment.p1_y];
-                line[1] = [segment.p2_x, segment.p2_y];
-                let point = [this.location.x, this.location.y];
-                if (getPointLineDistance(line,point) < this.size/2){   // collision
+
+                let line_v = {x: segment.p1_x, y: segment.p1_y};
+
+                let line_w = {x: segment.p2_x, y: segment.p2_y};
+
+                let point =  {x: this.location.x, y: this.location.y};
+                if (distToSegment(point, line_v, line_w) < this.size/2){   // collision
                     col = true;
                 }
 

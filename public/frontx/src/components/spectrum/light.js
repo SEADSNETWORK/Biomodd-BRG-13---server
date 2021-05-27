@@ -1,5 +1,6 @@
 import {IO_STATE, InteractiveObject} from './interactiveObject'
 import {mouseV} from './aux'
+import p5 from "react-p5"
 // ===============================
 //      L I G H T
 // ===============================
@@ -21,12 +22,15 @@ class Handle extends InteractiveObject {
 
 
 class Segment {
-    constructor(p1_x, p1_y, p2_x, p2_y, color){
+    constructor(p1_x, p1_y, p2_x, p2_y, color, mirror = null, creatorMirror = null){
         this.p1_x = p1_x;
         this.p1_y = p1_y;
         this.p2_x = p2_x;
         this.p2_y = p2_y;
         this.color = color;
+        this.mirror = mirror;
+        this.creatorMirror = creatorMirror;
+
     }
 }
 
@@ -37,17 +41,55 @@ class Beam {
         const p2 = p5.createVector(0, 0).set(this.direction);
         p2.mult(p5.width);
         p2.add(this.origin);
+        this.segments = [];
         this.segments[0]= new Segment(this.origin.x, this.origin.y, p2.x, p2.y, this.color);
     }
-
-    addSegment(i, x, y, angle, color){
+    revert(i, p5){
+        console.log("rev");
+        //console.log(this.segments);
+        //console.log(i);
+        //var lastSeg  = this.segments[i];
+        //this.segments.splice(i);
+        //this.segments = [];
+        //this.createSegmentZero(p5);
+        //this.segments[this.segments.length] = lastSeg;
+        this.segments = [];
+        this.createSegmentZero(p5);
+    }
+    addSegment(p5, i, x, y, angle, color, mirror){
         var lastSeg  = this.segments[i];
         this.segments.splice(i);
         // calc enddddddddd
-        let x2 = Math.cos(angle)*800;
-        let y2 = Math.sin(angle)*800;
-        this.segments[this.segments.length] = new Segment( lastSeg.p1_x, lastSeg.p1_y, x, y, color);
-        this.segments[this.segments.length] = new Segment(x, y, x2, y2, color);
+        //var v = p5.createVector(x, y);
+        //var v2 = p5.
+        //var v = window.p5.Vector.fromAngle(Math.PI/2, 800);
+        //let x2 = v.x;//x+(800 * Math.cos(angle)); //= Math.cos(angle);//
+        angle = angle %(2*Math.PI);
+        //if (angle < Math.PI){
+            angle = Math.PI - angle;
+
+        //} else {
+           // angle =  2*Math.PI - angle;
+        //}
+
+        angle = angle -Math.PI/2;
+        while (angle < 0) {
+            angle+=(Math.PI*2);
+        }
+        let n_ang = 4.7124;
+        let x2 = x+(800 * Math.cos(angle )); //= Math.cos(angle);//
+
+        //x2 *=800;
+        //x2= x + x2 ;
+        //x2 = 800 - x2;
+        //let y2 =  v.y;//y+(800 * Math.sin(angle)); // Math.sin(angle) ;//
+        let y2 =  y+(800 * Math.sin(angle)); // Math.sin(angle) ;//
+        //y2 *=800;
+        //y2=y- y2;
+        //p5.push();
+        //p5.translate(x,y);
+        this.segments[this.segments.length] = new Segment( lastSeg.p1_x, lastSeg.p1_y, x, y, color, mirror);
+        this.segments[this.segments.length] = new Segment( x, y, x2, y2, color, null, mirror);
 
     }
 
@@ -55,7 +97,7 @@ class Beam {
         this.origin = origin;
         this.direction = direction;
         this.color = color;
-        this.segments = []
+        this.segments = [];
         this.createSegmentZero(p5);
     }
 

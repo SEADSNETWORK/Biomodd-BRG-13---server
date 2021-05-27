@@ -41,14 +41,14 @@ export default ({socket}) => {
     };
 
     const plantSettings = {
-        amount: 3,
+        amount: 1,
         size: 40,
         color: "darkgreen",
         alternativeColor: "lightgreen"
     }
 
     const mirrorSettings = {
-        amount: 3,
+        amount: 5,
         size: 50,
         color: "magenta",
         alternativeColor: "0f0"
@@ -74,6 +74,7 @@ export default ({socket}) => {
 
         // setup lights
         ["red", "green", "blue"].forEach((color, i)=>{
+        //["green"].forEach((color, i)=>{
             lights.set(color, new Light(
                 {
                     color, 
@@ -110,8 +111,8 @@ export default ({socket}) => {
 	const draw = (p5) => {
 		p5.background(settings.background);
         toDraw.forEach(td=>td.draw(p5));
-        mirrors.forEach(mr=>mr.checkSegments(lights))
-        plants.forEach(mr=>mr.detectCollision(lights))
+        mirrors.forEach(mr=>mr.checkSegments(lights, p5));
+        plants.forEach(mr=>mr.detectCollision(lights));
 	};
 
     // ===============================

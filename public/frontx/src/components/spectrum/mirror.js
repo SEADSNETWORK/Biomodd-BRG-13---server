@@ -1,5 +1,5 @@
-import {IO_STATE, InteractiveObject} from './interactiveObject.js'
-
+import {InteractiveObject, IO_STATE} from './interactiveObject.js'
+import {segment_intersection} from "./aux";
 // ===============================
 //      P L A N T
 // ===============================
@@ -15,8 +15,8 @@ class Mirror extends InteractiveObject {
         this.strokeWeight = 5;
     }
     isOver(loc){
-        var x = loc.x
-        var y = loc.y
+        let x = loc.x;
+        let y = loc.y;
         return this.location.x <= x && x <= this.location.x + this.strokeWeight &&
             this.location.y <= y && y <= this.location.y + this.size;
     }
@@ -24,8 +24,19 @@ class Mirror extends InteractiveObject {
 
 
     checkLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
+        if ((l11_x === l21_x)  && ((l12_y < l21_y) && (l11_y > l21_y))) {
+            return true;
+        }
+        return (l11_x === l22_x) && ((l12_y < l22_y) && (l11_y > l22_y));
+
+    };
+
+
+
+
+    findLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
         // if the lines intersect, the result contains the x and y of the intersection and boolean for whether line segment contains the point
-        var denominator, a, b, numerator1, numerator2, result = {
+        let denominator, a, b, numerator1, numerator2, result = {
             inter: false,
             x: null,
             y: null,
@@ -44,85 +55,64 @@ class Mirror extends InteractiveObject {
         // if we cast these lines infinitely in both directions, they intersect here:
         result.x = l11_x + (a * (l12_x - l11_x));
         result.y = l11_y + (a * (l12_y - l11_y));
-        /*
+
                 // it is worth noting that this should be the same as:
-                x = line2StartX + (b * (line2EndX - line2StartX));
-                y = line2StartX + (b * (line2EndY - line2StartY));
-                */
+               // x = line2StartX + (b * (line2EndX - line2StartX));
+               // y = line2StartX + (b * (line2EndY - line2StartY));
+
         // if line1 is a segment and line2 is infinite, they intersect if:
-        if (a > 0 && a < 1 && b > 0 && b < 1) {
+        if (a > 0 && a < 1 && b >= 0 && b <= 1) {
             result.inter = true;
         }
 
         return result;
     };
 
+
     getPoints(){
-        var x = this.location.x;
-        var y = this.location.y;
-            var p1 = {
-                x: x,
-                y: y,
-            };
-            var p2 = {
-                x: x + this.strokeWeight,
-                y: y,
-            };
-            var p3 = {
-                x: x,
-                y: y + this.size,
-            };
-            var p4 = {
-                x: x + this.strokeWeight,
-                y: y + this.size,
-            };
-
-            var lines = [];
-
-            lines[0] =  [p1,p3];    // left
-            lines[1] = [p2,p4];   // right
-
-            return lines;
+        let x = this.location.x;
+        let y = this.location.y;
+        let p1 = {
+            x: x,
+            y: y,
+        };
+        let p3 = {
+            x: x,
+            y: y + this.size,
+        };
+        return [p1, p3];
 
     }
 
-    checkSegments(lights){
-        var rectLines = this.getPoints();
-        for (let i = 0; i < rectLines.length; i++) {
-            var rectLine = rectLines[i];
-            for (let light of lights.values()) {
+    checkSegments(lights, p5 ){
+        let rectLine = this.getPoints();
+        for (let light of lights.values()) {
                 for (let j = 0; j < light.beam.segments.length; j++) {
+                    let disCon = false;
                     var segment = light.beam.segments[j];
-                    //console.log(rectLines);
-                    var inter = this.checkLineIntersection(rectLine[0].x, rectLine[0].y, rectLine[1].x, rectLine[1].y, segment.p1_x, segment.p1_y, segment.p2_x, segment.p2_y);
+                    if (this !==  segment.creatorMirror) {
+                        if (this === segment.mirror) {
+                            disCon = true;
+                        }
+                        var inter = this.findLineIntersection(rectLine[0].x, rectLine[0].y, rectLine[1].x, rectLine[1].y, segment.p1_x, segment.p1_y, segment.p2_x, segment.p2_y);
+                        if (inter.inter) {
+                            disCon = false;
 
-                    if (inter.inter) {
+                            let theta1 = Math.atan2(rectLine[0].y - rectLine[1].y, rectLine[0].x - rectLine[1].x);
+                            let theta2 = Math.atan2(segment.p1_y - inter.y, segment.p1_x- inter.x);
 
-                        var angleRotation = this.rotation;
+                            let diff = Math.abs(theta1- theta2);
+                            let angle = diff ;
 
-
-                        //if (inter.x = rectLines[0][0].x) {
-                        if (segment.p1_x < rectLines[0][0].x ) {    // entering from left
-
-                            let side1 = segment.p1_x - inter.x;
-                            let side2 = segment.p1_y - inter.y;
-                            var angle = Math.atan(side2 / side1);
-                            angle =  Math.PI - angle;
-
-                            light.beam.addSegment(j, inter.x, inter.y, angle, light.color);
-                        } else {   // entering from right
-                            let side1 = segment.p1_x - inter.x;
-                            let side2 = segment.p1_y - inter.y;
-                            var angle = Math.atan(side2 / side1);
-                            angle =  2*Math.PI - angle;
-
-                            light.beam.addSegment(j, inter.x, inter.y, angle, light.color);
+                            if (inter.x > segment.p1_x && inter.y > segment.p1_y){
+                                angle = (Math.PI*2) - angle;
+                            }
+                            light.beam.addSegment(p5, j, inter.x, inter.y, angle, light.color, this);
+                        }
+                        if (disCon) {
+                            light.beam.revert(j, p5);
                         }
                     }
-
-                }
-
-
             }
         }
 
