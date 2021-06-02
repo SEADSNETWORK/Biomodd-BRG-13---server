@@ -1,6 +1,6 @@
 import {IO_STATE, InteractiveObject} from './interactiveObject.js'
 
-import {distToSegment} from './aux'
+import {distToSegment} from './auxi'
 
 // ===============================
 //      P L A N T

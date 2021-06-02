@@ -1,5 +1,5 @@
 import {InteractiveObject, IO_STATE} from './interactiveObject.js'
-import {segment_intersection} from "./aux";
+import {segment_intersection} from "./auxi";
 // ===============================
 //      P L A N T
 // ===============================

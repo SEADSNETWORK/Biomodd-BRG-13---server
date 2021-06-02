@@ -1,6 +1,6 @@
 import React from "react";
 import Sketch from "react-p5";
-import {getPointOnCircle} from './aux'
+import {getPointOnCircle} from './auxi'
 import Plant from './plant'
 import Light from './light'
 import Mirror from "./mirror";

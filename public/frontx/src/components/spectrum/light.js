@@ -1,5 +1,5 @@
 import {IO_STATE, InteractiveObject} from './interactiveObject'
-import {mouseV} from './aux'
+import {mouseV} from './auxi'
 import p5 from "react-p5"
 // ===============================
 //      L I G H T
