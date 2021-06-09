@@ -72,31 +72,35 @@ export default ({socket}) => {
             p5.createCanvas(500, 500).parent(canvasParentRef);
         }
 
-        // setup lights
-        ["red", "green", "blue"].forEach((color, i)=>{
-        //["green"].forEach((color, i)=>{
+        // create mirrors
+        for (let i = 0; i < mirrorSettings.amount; i++){
+            mirrors[i] = new Mirror({location: getRandomPoint(p5), ...mirrorSettings, id: i});
+            toDraw.push(mirrors[i]);
+            toInteract.push(mirrors[i]);
+        }
+
+
+        // Create lights
+        //let colors = ["green"];
+        let colors = ["red", "green", "blue"];
+        colors.forEach((color, i)=>{
             lights.set(color, new Light(
                 {
                     color, 
                     location: getPointOnCircle(p5, getCenter(p5), p5.width*lightSettings.offset, 3, i),
                     ...lightSettings
-            }, p5));
+            }, mirrors, p5));
             toDraw.push(lights.get(color));
             toInteract.push(lights.get(color));
         })
 
+        // create plants
         for (let i = 0; i < plantSettings.amount; i++){
             plants[i] = new Plant({location: getRandomPoint(p5), ...plantSettings});
             toDraw.push(plants[i]);
             toInteract.push(plants[i]);
         }
 
-
-        for (let i = 0; i < mirrorSettings.amount; i++){
-            mirrors[i] = new Mirror({location: getRandomPoint(p5), ...mirrorSettings});
-            toDraw.push(mirrors[i]);
-            toInteract.push(mirrors[i]);
-        }
 
         // setup sockets
         socket.on("/gameUpdateWorld", (gameWorld)=>{
@@ -111,7 +115,6 @@ export default ({socket}) => {
 	const draw = (p5) => {
 		p5.background(settings.background);
         toDraw.forEach(td=>td.draw(p5));
-        mirrors.forEach(mr=>mr.checkSegments(lights, p5));
         plants.forEach(mr=>mr.detectCollision(lights));
 	};
 

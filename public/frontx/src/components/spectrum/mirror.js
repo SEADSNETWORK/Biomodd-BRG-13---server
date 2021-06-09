@@ -6,22 +6,23 @@ import {segment_intersection} from "./auxi";
 // Them plants
 
 class Mirror extends InteractiveObject {
-    constructor({location, size, color, alternativeColor, direction}){
+    constructor({location, size, color, alternativeColor, direction, id}){
         super(location, size);
         this.color = color;
         this.alternativeColor = alternativeColor;
         this.direction = direction;
         this.rotation = 0;
         this.strokeWeight = 5;
+        // DEBUG: adding an id to be able to see if there is a pattern to which mirror is breaking.
+        this.id = "mirror_"+id;
     }
+
     isOver(loc){
         let x = loc.x;
         let y = loc.y;
         return this.location.x <= x && x <= this.location.x + this.strokeWeight &&
             this.location.y <= y && y <= this.location.y + this.size;
     }
-
-
 
     checkLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
         if ((l11_x === l21_x)  && ((l12_y < l21_y) && (l11_y > l21_y))) {
@@ -68,7 +69,6 @@ class Mirror extends InteractiveObject {
         return result;
     };
 
-
     getPoints(){
         let x = this.location.x;
         let y = this.location.y;
@@ -81,9 +81,9 @@ class Mirror extends InteractiveObject {
             y: y + this.size,
         };
         return [p1, p3];
-
     }
 
+    
     checkSegments(lights, p5 ){
         let rectLine = this.getPoints();
         for (let light of lights.values()) {
