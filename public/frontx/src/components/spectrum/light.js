@@ -61,7 +61,7 @@ class Beam {
     this function creates a beam and then checks if it reflects off a mirror (another new function);
     on reflection it will create a segment, add it to the array and cast a new beam from the reflection point
     */
-    cast(direction, startPoint, p5){
+    cast(direction, startPoint, p5, cnt){
         // draw from point of origin in direction
         const beam = p5.createVector(startPoint).set(direction);
         beam.mult(p5.width);
@@ -75,7 +75,10 @@ class Beam {
             this.segments.push(new Segment(startPoint.x, startPoint.y, reflectionData.x, reflectionData.y, this.color));
             // cast new beam from reflectionpoint
             let reflectionStart = p5.createVector(reflectionData.x, reflectionData.y);
-            this.cast(reflectionData.direction, reflectionStart, p5);
+            cnt++;
+            if(cnt<1000){
+                this.cast(reflectionData.direction, reflectionStart, p5, cnt);
+            }
         } else {
             // no reflection has been detected
             this.segments.push(new Segment(startPoint.x, startPoint.y, beam.x, beam.y, this.color));
@@ -124,6 +127,7 @@ class Beam {
                 if(intersectionPoints[0].distance==0) {
                     return false;
                 } else {
+
                     intersectionPoint = intersectionPoints[0];
                 }
             }  else {
@@ -147,12 +151,47 @@ class Beam {
             // NOTE: this will have to be redone when the mirrors can rotate.... worries for later
             return intersectionPoint;
         }
-
+        
     }
+    
 
+    draw(p5) {
+        // reset segments
+        this.segments = [];
+        // debug: points of intersection
+        this.intersectPoints = [];
+        // cast first beam (this starts the population of the segments array)
+        this.cast(this.direction, this.origin, p5, 0);
+        
+        // this debug flag shows or hide the dots that indicate intersection points on the beam
+        let debug = false;
+        if(debug){
+            for(let j=0; j<this.intersectPoints.length; j++) {
+                p5.fill(255, 0, 0);
+                p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
+            }
+        }
+        
+        p5.noFill();
 
+        // loop through and draw segments
+        for (let i=0; i<this.segments.length; i++){
+            p5.stroke(this.segments[i].color);
+            p5.line(this.segments[i].p1_x, this.segments[i].p1_y, this.segments[i].p2_x, this.segments[i].p2_y);
+        }
+    }
+    
+    
+
+    
+    /* OLD FUNCTIONS: 
+    ----------------------------
+    These are the functions from the first prototype of the game. 
+    Keeping them in for now in case we need anything from them in the new version of the prototype
+    */
+
+    
     /*
-    // old. To be replaced with new createSegment function
     createSegmentZero(p5){
         const p2 = p5.createVector(0, 0).set(this.direction);
         p2.mult(p5.width);
@@ -160,7 +199,7 @@ class Beam {
         this.segments = [];
         this.segments[0]= new Segment(this.origin.x, this.origin.y, p2.x, p2.y, this.color);
     }
-    // old. New way of creating segments and checking reflections should make this unneccesary
+    
     revert(i, p5){
         console.log("rev");
         //console.log(this.segments);
@@ -173,7 +212,7 @@ class Beam {
         this.segments = [];
         this.createSegmentZero(p5);
     }
-    // old. To be replaced with new createSegment() function
+    
     addSegment(p5, i, x, y, angle, color, mirror){
         var lastSeg  = this.segments[i];
         this.segments.splice(i);
@@ -220,35 +259,9 @@ class Beam {
         }
     }
     */
-
-    // new draw function: simply calls cast to calculate and draw this beam
-    draw(p5) {
-
-        // reset segments
-        this.segments = [];
-        // debug: points of intersection
-        this.intersectPoints = [];
-        // cast first beam (this will populate the segments array)
-        this.cast(this.direction, this.origin, p5);
-        
-        /*
-        // debug: show intersect points
-        for(let j=0; j<this.intersectPoints.length; j++) {
-            p5.fill(255, 0, 0);
-            p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
-        }
-        */
-        
-        
-        p5.noFill();
-
-        // loop through and draw segments
-        for (let i=0; i<this.segments.length; i++){
-            p5.stroke(this.segments[i].color);
-            p5.line(this.segments[i].p1_x, this.segments[i].p1_y, this.segments[i].p2_x, this.segments[i].p2_y);
-        }
-    }
 }
+
+
 
 class Light extends InteractiveObject {
     constructor({color, size, location, controlOffset, strokeWeight}, mirrors, p5){

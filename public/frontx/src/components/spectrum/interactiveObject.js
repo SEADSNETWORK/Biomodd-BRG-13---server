@@ -30,9 +30,6 @@ export class InteractiveObject {
     mousePressed(p5){
         if (this.isCurrentOver(p5)){
             this.state = IO_STATE.CLICKED;
-
-            // DEBUG: print id of object on click (if present)
-            if(this.id!== undefined) console.log(this.id);
         }
     }
 

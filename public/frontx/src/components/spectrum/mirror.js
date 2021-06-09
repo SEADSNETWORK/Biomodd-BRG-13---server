@@ -13,10 +13,24 @@ class Mirror extends InteractiveObject {
         this.direction = direction;
         this.rotation = 0;
         this.strokeWeight = 5;
-        // DEBUG: adding an id to be able to see if there is a pattern to which mirror is breaking.
+        // store mirror id, as it can help with debugging
         this.id = "mirror_"+id;
 
         console.log(this.size);
+    }
+
+    getPoints(){
+        let x = this.location.x;
+        let y = this.location.y;
+        let p1 = {
+            x: x,
+            y: y,
+        };
+        let p3 = {
+            x: x,
+            y: y + this.size,
+        };
+        return [p1, p3];
     }
 
     isOver(loc){
@@ -26,17 +40,20 @@ class Mirror extends InteractiveObject {
             this.location.y <= y && y <= this.location.y + this.size;
     }
 
+
+    /*
+    // this function shouldn't be needed anymore, replaced by cast() and reflect() on the beam object
     checkLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
         if ((l11_x === l21_x)  && ((l12_y < l21_y) && (l11_y > l21_y))) {
             return true;
         }
         return (l11_x === l22_x) && ((l12_y < l22_y) && (l11_y > l22_y));
 
-    };
+    }
+    */
 
-
-
-
+    /*
+    this function shouldn't be needed anymore and is replaced by the cast() and reflect() function on the beam objecdt
     findLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
         // if the lines intersect, the result contains the x and y of the intersection and boolean for whether line segment contains the point
         let denominator, a, b, numerator1, numerator2, result = {
@@ -69,23 +86,12 @@ class Mirror extends InteractiveObject {
         }
 
         return result;
-    };
-
-    getPoints(){
-        let x = this.location.x;
-        let y = this.location.y;
-        let p1 = {
-            x: x,
-            y: y,
-        };
-        let p3 = {
-            x: x,
-            y: y + this.size,
-        };
-        return [p1, p3];
-    }
+    } 
+    */
 
     
+    /* 
+    // this function shouldn't be needed anymore
     checkSegments(lights, p5 ){
         let rectLine = this.getPoints();
         for (let light of lights.values()) {
@@ -119,6 +125,7 @@ class Mirror extends InteractiveObject {
         }
 
     }
+    */
 
     draw(p5){
         //p5.noStroke();
