@@ -230,6 +230,7 @@ class Beam {
         this.intersectPoints = [];
         // cast first beam (this will populate the segments array)
         this.cast(this.direction, this.origin, p5);
+        
         /*
         // debug: show intersect points
         for(let j=0; j<this.intersectPoints.length; j++) {
@@ -237,6 +238,7 @@ class Beam {
             p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
         }
         */
+        
         
         p5.noFill();
 
@@ -258,8 +260,7 @@ class Light extends InteractiveObject {
         this.handle = new Handle(p5.createVector(0, 0), 10, this.color);
         this.beam = new Beam(this.location, this.getDirection(p5), color, mirrors, p5);
         const r = ()=>p5.random(-this.handleOffset(), this.handleOffset());
-        this.moveHandle(p5, p5.createVector().set(this.location).add(p5.createVector(r(), r())))
-        
+        this.moveHandle(p5, p5.createVector().set(this.location).add(p5.createVector(r(), r())))        
     }
 
     draw(p5){

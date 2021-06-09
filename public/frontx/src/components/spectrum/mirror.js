@@ -122,14 +122,16 @@ class Mirror extends InteractiveObject {
 
     draw(p5){
         //p5.noStroke();
+        p5.strokeWeight(this.strokeWeight);
         if (this.state === IO_STATE.UNSELECTED || this.state === IO_STATE.HOVERING){
             p5.stroke(this.color);
         } else {
             if (this.state === IO_STATE.DRAGGED ){
                 this.location.x = p5.mouseX ;
                 this.location.y = p5.mouseY ;
+                p5.stroke(this.color);
             }
-            p5.fill(this.alternativeColor);
+            //p5.fill(this.alternativeColor);
         }
 
         let size = this.size;
@@ -137,7 +139,6 @@ class Mirror extends InteractiveObject {
             size+=Math.sin(p5.millis())*2;
         }
 
-        p5.strokeWeight(this.strokeWeight);
         p5.line(this.location.x, this.location.y, this.location.x, this.location.y+size);
         //p5.stroke(200);
     }
