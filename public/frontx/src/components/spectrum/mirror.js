@@ -15,6 +15,8 @@ class Mirror extends InteractiveObject {
         this.strokeWeight = 5;
         // DEBUG: adding an id to be able to see if there is a pattern to which mirror is breaking.
         this.id = "mirror_"+id;
+
+        console.log(this.size);
     }
 
     isOver(loc){
@@ -135,8 +137,8 @@ class Mirror extends InteractiveObject {
             size+=Math.sin(p5.millis())*2;
         }
 
-        p5.line(this.location.x, this.location.y, this.location.x, this.location.y+size);
         p5.strokeWeight(this.strokeWeight);
+        p5.line(this.location.x, this.location.y, this.location.x, this.location.y+size);
         //p5.stroke(200);
     }
 }
