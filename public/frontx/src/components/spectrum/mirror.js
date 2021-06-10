@@ -1,4 +1,5 @@
 import {InteractiveObject, IO_STATE} from './interactiveObject.js'
+import Handle from "./handle.js"
 import {segment_intersection} from "./auxi";
 // ===============================
 //      P L A N T
@@ -6,7 +7,7 @@ import {segment_intersection} from "./auxi";
 // Them plants
 
 class Mirror extends InteractiveObject {
-    constructor({location, size, color, alternativeColor, direction, id}){
+    constructor({location, size, color, alternativeColor, direction, id}, p5){
         super(location, size);
         this.color = color;
         this.alternativeColor = alternativeColor;
@@ -15,8 +16,9 @@ class Mirror extends InteractiveObject {
         this.strokeWeight = 5;
         // store mirror id, as it can help with debugging
         this.id = "mirror_"+id;
-
-        console.log(this.size);
+        
+        let randDirection = p5.createVector(p5.random(-1, 1), p5.random(-1, 1));
+        this.handle = new Handle(this.location, 10, 30, randDirection, this.color, 2);
     }
 
     getPoints(){
@@ -33,6 +35,7 @@ class Mirror extends InteractiveObject {
         return [p1, p3];
     }
 
+    
     isOver(loc){
         let x = loc.x;
         let y = loc.y;
@@ -41,104 +44,16 @@ class Mirror extends InteractiveObject {
     }
 
 
-    /*
-    // this function shouldn't be needed anymore, replaced by cast() and reflect() on the beam object
-    checkLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
-        if ((l11_x === l21_x)  && ((l12_y < l21_y) && (l11_y > l21_y))) {
-            return true;
-        }
-        return (l11_x === l22_x) && ((l12_y < l22_y) && (l11_y > l22_y));
-
-    }
-    */
-
-    /*
-    this function shouldn't be needed anymore and is replaced by the cast() and reflect() function on the beam objecdt
-    findLineIntersection(l11_x, l11_y, l12_x, l12_y, l21_x, l21_y, l22_x, l22_y) {
-        // if the lines intersect, the result contains the x and y of the intersection and boolean for whether line segment contains the point
-        let denominator, a, b, numerator1, numerator2, result = {
-            inter: false,
-            x: null,
-            y: null,
-        };
-        denominator = ((l22_y - l21_y) * (l12_x - l11_x)) - ((l22_x - l21_x) * (l12_y - l11_y));
-        if (denominator === 0) {
-            return result;
-        }
-        a = l11_y - l21_y;
-        b = l11_x - l21_x;
-        numerator1 = ((l22_x - l21_x) * a) - ((l22_y - l21_y) * b);
-        numerator2 = ((l12_x - l11_x) * a) - ((l12_y - l11_y) * b);
-        a = numerator1 / denominator;
-        b = numerator2 / denominator;
-
-        // if we cast these lines infinitely in both directions, they intersect here:
-        result.x = l11_x + (a * (l12_x - l11_x));
-        result.y = l11_y + (a * (l12_y - l11_y));
-
-                // it is worth noting that this should be the same as:
-               // x = line2StartX + (b * (line2EndX - line2StartX));
-               // y = line2StartX + (b * (line2EndY - line2StartY));
-
-        // if line1 is a segment and line2 is infinite, they intersect if:
-        if (a > 0 && a < 1 && b >= 0 && b <= 1) {
-            result.inter = true;
-        }
-
-        return result;
-    } 
-    */
-
-    
-    /* 
-    // this function shouldn't be needed anymore
-    checkSegments(lights, p5 ){
-        let rectLine = this.getPoints();
-        for (let light of lights.values()) {
-                for (let j = 0; j < light.beam.segments.length; j++) {
-                    let disCon = false;
-                    var segment = light.beam.segments[j];
-                    if (this !==  segment.creatorMirror) {
-                        if (this === segment.mirror) {
-                            disCon = true;
-                        }
-                        var inter = this.findLineIntersection(rectLine[0].x, rectLine[0].y, rectLine[1].x, rectLine[1].y, segment.p1_x, segment.p1_y, segment.p2_x, segment.p2_y);
-                        if (inter.inter) {
-                            disCon = false;
-
-                            let theta1 = Math.atan2(rectLine[0].y - rectLine[1].y, rectLine[0].x - rectLine[1].x);
-                            let theta2 = Math.atan2(segment.p1_y - inter.y, segment.p1_x- inter.x);
-
-                            let diff = Math.abs(theta1- theta2);
-                            let angle = diff ;
-
-                            if (inter.x > segment.p1_x && inter.y > segment.p1_y){
-                                angle = (Math.PI*2) - angle;
-                            }
-                            light.beam.addSegment(p5, j, inter.x, inter.y, angle, light.color, this);
-                        }
-                        if (disCon) {
-                            light.beam.revert(j, p5);
-                        }
-                    }
-            }
-        }
-
-    }
-    */
 
     draw(p5){
         //p5.noStroke();
         p5.strokeWeight(this.strokeWeight);
-        if (this.state === IO_STATE.UNSELECTED || this.state === IO_STATE.HOVERING){
-            p5.stroke(this.color);
-        } else {
+        p5.stroke(this.color);
+        if (this.state !== IO_STATE.UNSELECTED && this.state !== IO_STATE.HOVERING){
             if (this.state === IO_STATE.DRAGGED ){
                 this.location.x = p5.mouseX ;
                 this.location.y = p5.mouseY ;
-                p5.stroke(this.color);
             }
-            //p5.fill(this.alternativeColor);
         }
 
         let size = this.size;
@@ -147,8 +62,32 @@ class Mirror extends InteractiveObject {
         }
 
         p5.line(this.location.x, this.location.y, this.location.x, this.location.y+size);
-        //p5.stroke(200);
+        
+        this.handle.draw(p5);
     }
+
+    
+    // ---- I/O stuff 
+    // passing interactions down to the handle member
+    mousePressed(p5){
+        super.mousePressed(p5);
+        this.handle.mousePressed(p5);
+    }
+
+    mouseReleased(p5){
+        super.mouseReleased(p5);
+        this.handle.mouseReleased(p5);
+    }
+
+    mouseDragged(p5){
+        super.mouseDragged(p5);
+        this.handle.mouseDragged(p5);
+    }
+
+    mouseMoved(p5){
+        super.mouseMoved(p5);
+        this.handle.mouseMoved(p5);
+    }    
 }
 
 export default Mirror;
