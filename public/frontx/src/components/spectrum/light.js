@@ -2,9 +2,22 @@ import {IO_STATE, InteractiveObject} from './interactiveObject'
 import {mouseV} from './auxi'
 import p5 from "react-p5"
 import Handle from "./handle.js"
+
+
 // ===============================
 //      L I G H T
 // ===============================
+
+/* 
+    Contains the objects: 
+    - Segment:
+        Describes a segment on a beam of light, each segment is the result of a reflection off of a mirror
+    - Beam
+        Functionality of a full beam, this includes the ability to cast a beam in a direction and detect reflections
+    - Light:
+        Functionality of the full light, containing a beam, handle, and IO
+
+*/
 // The object that emits a beam of light
 
 
@@ -82,8 +95,8 @@ class Beam {
 
         // loop through mirrors
         for(let i=0; i<this.mirrors.length; i++) {
-            let mirrorStart = this.mirrors[i].getPoints()[0];
-            let mirrorEnd = this.mirrors[i].getPoints()[1];
+            let mirrorStart = this.mirrors[i].getPoints(p5)[0];
+            let mirrorEnd = this.mirrors[i].getPoints(p5)[1];
 
             //if(this.mirrors[i].id == "mirror_0") console.log("x3: "+ mirrorStart.x + ", y3: "+ mirrorStart.y + " | x4: "+ mirrorEnd.x + ", y4: "+ mirrorEnd.y);
 
@@ -206,13 +219,20 @@ class Light extends InteractiveObject {
         this.beam.draw(p5, this.handle.getDirection(p5));
     }
 
+    /*
+    // Probably not used anymore
     handleOffset(){
         return (this.controlOffset+this.size)/2;
     }
 
+    // Probably not used anymore
     getDirection(p5){
         this.handle.getDirection(p5);
     }
+    */
+
+    
+
 
     // ---- I/O stuff 
     // passing interactions down to the handle member
