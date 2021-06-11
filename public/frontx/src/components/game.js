@@ -48,14 +48,19 @@ const Game = ()=>{
       <br/><br/>
       <theme.Wrapped>
         <theme.Container>
-          <theme.Title>
-              GAME
-          </theme.Title>
+        <theme.Text >
+              <span style={{color: "black", fontSize: "3em", fontWeight: "bold"}}>
+                  GAME
+              </span>
+                
+            </theme.Text>
           <br/>
 
-          <theme.SubTitle>
-            Simple version
-          </theme.SubTitle>
+          <theme.Text>
+            <b>Simple version</b>
+            
+          </theme.Text>
+          <br/>
           <theme.Text>
             Proof of concept game version with simulated data - will be updated as the development progresses
             <br/>

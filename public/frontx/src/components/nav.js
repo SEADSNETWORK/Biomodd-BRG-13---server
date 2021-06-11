@@ -1,15 +1,18 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useSelector } from "react-redux";
-import { Grid, Col, Row, Theme} from '../theme'
+import { Col, Row} from '../theme'
 import { NavLink } from 'react-router-dom';
 import Logo from '../assets/logo.svg'
 
 const Nav = ()=>{
     const theme = useSelector(state => state.data.theme);
+    
 
-    if (!theme){
+    if (!theme ){
         return null;
     }
+
+    
 
     return <Row center="xs">
 
@@ -21,9 +24,12 @@ const Nav = ()=>{
         <Col xs={12} sm={10}>
             <br/><br/>
             <NavLink to="/">
-            <theme.Title style={{color: "white", fontSize: "4em"}}>
-                &nbsp;BIOMODD [BRG<sup>13</sup>]
-            </theme.Title>
+            <theme.Text >
+              <span style={{color: "white", fontSize: "4em", fontWeight: "bold"}}>
+                  &nbsp;BIOMODD [BRG<sup>13</sup>]
+              </span>
+                
+            </theme.Text>
             </NavLink>
             <theme.Container>
             <theme.Text>

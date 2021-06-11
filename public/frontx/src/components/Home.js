@@ -13,12 +13,8 @@ const Home = ()=>{
     const news = useSelector(state => state.data.news);
     const events = useSelector(state=>state.data.events)
     const faqs = useSelector(state=>state.data.faqs)
-    
-    
-    
     const newsref = useRef(null);
     
-
     if (!theme){
         return null;
     } else {

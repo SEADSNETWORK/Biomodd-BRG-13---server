@@ -70,6 +70,8 @@ export default ({socket}) => {
         // setup canvas
         if (canvasParentRef){
             p5.createCanvas(500, 500).parent(canvasParentRef);
+        } else {
+            throw "canvas not found"
         }
 
         // create mirrors

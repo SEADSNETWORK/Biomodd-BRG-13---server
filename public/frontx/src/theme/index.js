@@ -142,9 +142,11 @@ class Theme {
     // }
 
     get Title(){
+        // return ({children})=><EmptySpan content={this.defaultFont}>{children}</EmptySpan>
         return styled.div`
             ${this.defaultFont}
             font-size: ${this.sizes.title}; 
+            font-weight: bold;
         `
     }
 
