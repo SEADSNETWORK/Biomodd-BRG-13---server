@@ -76,7 +76,7 @@ export default ({socket}) => {
 
         // create mirrors
         for (let i = 0; i < mirrorSettings.amount; i++){
-            mirrors[i] = new Mirror({location: getRandomPoint(p5), ...mirrorSettings, id: i});
+            mirrors[i] = new Mirror({location: getRandomPoint(p5), ...mirrorSettings, id: i}, p5);
             toDraw.push(mirrors[i]);
             toInteract.push(mirrors[i]);
         }

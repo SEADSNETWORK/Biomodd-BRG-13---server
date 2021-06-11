@@ -1,35 +1,35 @@
 import {IO_STATE, InteractiveObject} from './interactiveObject'
 import {mouseV} from './auxi'
 import p5 from "react-p5"
+import Handle from "./handle.js"
+
+
 // ===============================
 //      L I G H T
 // ===============================
+
+/* 
+    Contains the objects: 
+    - Segment:
+        Describes a segment on a beam of light, each segment is the result of a reflection off of a mirror
+    - Beam
+        Functionality of a full beam, this includes the ability to cast a beam in a direction and detect reflections
+    - Light:
+        Functionality of the full light, containing a beam, handle, and IO
+
+*/
 // The object that emits a beam of light
 
-// the handle that allows for the rotation of the light
-class Handle extends InteractiveObject {
-    constructor (location, size, color){
-        super(location, size);
-        this.color = color;
-    }
-
-    draw(p5){
-        p5.noStroke();
-        p5.fill(this.color);
-        p5.circle(this.location.x, this.location.y, this.state===IO_STATE.UNSELECTED?this.size:this.size*1.2);
-    }
-}
 
 
 class Segment {
-    constructor(p1_x, p1_y, p2_x, p2_y, color, mirror = null, creatorMirror = null){
+    constructor(p1_x, p1_y, p2_x, p2_y, color, mirror){
         this.p1_x = p1_x;
         this.p1_y = p1_y;
         this.p2_x = p2_x;
         this.p2_y = p2_y;
         this.color = color;
         this.mirror = mirror;
-        this.creatorMirror = creatorMirror;
     }
 }
 
@@ -42,10 +42,9 @@ class Beam {
         this.color = color;
         this.segments = [];
         this.mirrors = mirrors;
-        //this.createSegmentZero(p5);
-        //this.createSegment(this.direction, this.origin, mirrors, p5);
 
-        // debug: keep track of calculated intersection points
+        // array to keep track of calculated intersection points
+        // this is mostly for debugging
         this.intersectPoints = [];
     }
 
@@ -61,37 +60,41 @@ class Beam {
     this function creates a beam and then checks if it reflects off a mirror (another new function);
     on reflection it will create a segment, add it to the array and cast a new beam from the reflection point
     */
-    cast(direction, startPoint, p5){
+    cast(direction, startPoint, p5, cnt, mirror){
         // draw from point of origin in direction
         const beam = p5.createVector(startPoint).set(direction);
-        beam.mult(p5.width);
+        // set the beam length to the diagonal of the sketch so it always reaches the end of the screen
+        beam.setMag(Math.sqrt(Math.pow(p5.width, 2)+Math.pow(p5.height, 2)));
         beam.add(startPoint);
         
         // check beam for reflection (function)
-        let reflectionData = this.reflect(startPoint, beam, direction, p5);
+        let reflectionData = this.reflect(startPoint, beam, direction, p5, mirror);
         if(reflectionData!==false) {
-            // cut off this beam on the reflection point
             // create segment and add to segments array
-            this.segments.push(new Segment(startPoint.x, startPoint.y, reflectionData.x, reflectionData.y, this.color));
+            this.segments.push(new Segment(startPoint.x, startPoint.y, reflectionData.x, reflectionData.y, this.color, mirror));
             // cast new beam from reflectionpoint
             let reflectionStart = p5.createVector(reflectionData.x, reflectionData.y);
-            this.cast(reflectionData.direction, reflectionStart, p5);
+            // keep counter to stop excessive recursion
+            cnt++;
+            if(cnt<1000){
+                this.cast(reflectionData.direction, reflectionStart, p5, cnt, reflectionData.mirror);
+            }
         } else {
             // no reflection has been detected
-            this.segments.push(new Segment(startPoint.x, startPoint.y, beam.x, beam.y, this.color));
+            this.segments.push(new Segment(startPoint.x, startPoint.y, beam.x, beam.y, this.color, mirror));
         }
     }
 
 
 
-    reflect(beamStart, beamEnd, direction, p5){
+    reflect(beamStart, beamEnd, direction, p5, mirror){
 
         let intersectionPoints = [];
 
         // loop through mirrors
         for(let i=0; i<this.mirrors.length; i++) {
-            let mirrorStart = this.mirrors[i].getPoints()[0];
-            let mirrorEnd = this.mirrors[i].getPoints()[1];
+            let mirrorStart = this.mirrors[i].getPoints(p5)[0];
+            let mirrorEnd = this.mirrors[i].getPoints(p5)[1];
 
             //if(this.mirrors[i].id == "mirror_0") console.log("x3: "+ mirrorStart.x + ", y3: "+ mirrorStart.y + " | x4: "+ mirrorEnd.x + ", y4: "+ mirrorEnd.y);
 
@@ -107,7 +110,9 @@ class Beam {
                 let y = beamStart.y + t * (beamEnd.y - beamStart.y);
                 let distance = p5.dist(beamStart.x, beamStart.y, x, y);
                 // save for later
-                intersectionPoints.push({x: x, y: y, distance: distance, mirror: i, direction: 0});
+                if(this.mirrors[i].id!=mirror) {
+                    intersectionPoints.push({x: x, y: y, distance: distance, mirror: this.mirrors[i].id, direction: 0});
+                }
             }
             
         }
@@ -124,6 +129,7 @@ class Beam {
                 if(intersectionPoints[0].distance==0) {
                     return false;
                 } else {
+
                     intersectionPoint = intersectionPoints[0];
                 }
             }  else {
@@ -139,116 +145,54 @@ class Beam {
                 }
                 
             }
-            let newDirection = p5.createVector(-direction.x, direction.y);
-            intersectionPoint.direction = newDirection;
-            this.intersectPoints.push(intersectionPoint);
             
             // calculate angle
             // NOTE: this will have to be redone when the mirrors can rotate.... worries for later
+            let newDirection = p5.createVector(-direction.x, direction.y);
+            intersectionPoint.direction = newDirection;
+            // add to array and return
+            this.intersectPoints.push(intersectionPoint);
             return intersectionPoint;
         }
-
+        
     }
+    
 
-
-    /*
-    // old. To be replaced with new createSegment function
-    createSegmentZero(p5){
-        const p2 = p5.createVector(0, 0).set(this.direction);
-        p2.mult(p5.width);
-        p2.add(this.origin);
-        this.segments = [];
-        this.segments[0]= new Segment(this.origin.x, this.origin.y, p2.x, p2.y, this.color);
-    }
-    // old. New way of creating segments and checking reflections should make this unneccesary
-    revert(i, p5){
-        console.log("rev");
-        //console.log(this.segments);
-        //console.log(i);
-        //var lastSeg  = this.segments[i];
-        //this.segments.splice(i);
-        //this.segments = [];
-        //this.createSegmentZero(p5);
-        //this.segments[this.segments.length] = lastSeg;
-        this.segments = [];
-        this.createSegmentZero(p5);
-    }
-    // old. To be replaced with new createSegment() function
-    addSegment(p5, i, x, y, angle, color, mirror){
-        var lastSeg  = this.segments[i];
-        this.segments.splice(i);
-        // calc enddddddddd
-        //var v = p5.createVector(x, y);
-        //var v2 = p5.
-        //var v = window.p5.Vector.fromAngle(Math.PI/2, 800);
-        //let x2 = v.x;//x+(800 * Math.cos(angle)); //= Math.cos(angle);//
-        angle = angle %(2*Math.PI);
-        //if (angle < Math.PI){
-            angle = Math.PI - angle;
-
-        //} else {
-           // angle =  2*Math.PI - angle;
-        //}
-
-        angle = angle -Math.PI/2;
-        while (angle < 0) {
-            angle+=(Math.PI*2);
-        }
-        let n_ang = 4.7124;
-        let x2 = x+(800 * Math.cos(angle )); //= Math.cos(angle);//
-
-        //x2 *=800;
-        //x2= x + x2 ;
-        //x2 = 800 - x2;
-        //let y2 =  v.y;//y+(800 * Math.sin(angle)); // Math.sin(angle) ;//
-        let y2 =  y+(800 * Math.sin(angle)); // Math.sin(angle) ;//
-        //y2 *=800;
-        //y2=y- y2;
-        //p5.push();
-        //p5.translate(x,y);
-        this.segments[this.segments.length] = new Segment( lastSeg.p1_x, lastSeg.p1_y, x, y, color, mirror);
-        this.segments[this.segments.length] = new Segment( x, y, x2, y2, color, null, mirror);
-
-    }
-
-    // old draw function: 
-    draw(p5){
-        p5.noFill();
-        for (let i=0; i<this.segments.length; i++){
-            p5.stroke(this.segments[i].color);
-            p5.line(this.segments[i].p1_x, this.segments[i].p1_y, this.segments[i].p2_x, this.segments[i].p2_y);
-        }
-    }
-    */
-
-    // new draw function: simply calls cast to calculate and draw this beam
-    draw(p5) {
-
+    draw(p5, direction) {
+        
         // reset segments
         this.segments = [];
         // debug: points of intersection
         this.intersectPoints = [];
-        // cast first beam (this will populate the segments array)
-        this.cast(this.direction, this.origin, p5);
+        // cast first beam (this starts the population of the segments array)
+        this.cast(p5.createVector(-direction.x, -direction.y), this.origin, p5, 0, null);
         
-        /*
-        // debug: show intersect points
-        for(let j=0; j<this.intersectPoints.length; j++) {
-            p5.fill(255, 0, 0);
-            p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
+        // this debug flag shows or hide the dots that indicate intersection points on the beam
+        let debug = true;
+        if(debug){
+            if(this.intersectPoints.length>0) {
+                //console.log("Number of intersection points: "+ this.intersectPoints.length);
+                for(let j=0; j<this.intersectPoints.length; j++) {
+                    //console.log(this.intersectPoints[j].distance);
+                    p5.fill(255, 0, 0);
+                    p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
+                }
+            }
         }
-        */
-        
         
         p5.noFill();
 
         // loop through and draw segments
         for (let i=0; i<this.segments.length; i++){
+            //console.log(this.segments[i].mirror);
             p5.stroke(this.segments[i].color);
             p5.line(this.segments[i].p1_x, this.segments[i].p1_y, this.segments[i].p2_x, this.segments[i].p2_y);
         }
     }
+    
 }
+
+
 
 class Light extends InteractiveObject {
     constructor({color, size, location, controlOffset, strokeWeight}, mirrors, p5){
@@ -257,63 +201,44 @@ class Light extends InteractiveObject {
         this.controlOffset = controlOffset;
         this.strokeWeight = strokeWeight;
 
-        this.handle = new Handle(p5.createVector(0, 0), 10, this.color);
-        this.beam = new Beam(this.location, this.getDirection(p5), color, mirrors, p5);
-        const r = ()=>p5.random(-this.handleOffset(), this.handleOffset());
-        this.moveHandle(p5, p5.createVector().set(this.location).add(p5.createVector(r(), r())))        
+         
+        // set random direction (direction needs to come from biomodd server) and create handle
+        let randDirection = p5.createVector(p5.random(-1, 1), p5.random(-1, 1));
+        this.handle = new Handle(this.location, 10, 50, randDirection, this.color, this.strokeWeight);
+
+        // create the beam with the direction from the handle
+        this.beam = new Beam(this.location, p5.createVector(-this.handle.getDirection(p5).x, -this.handle.getDirection(p5).y), color, mirrors, p5);        
     }
 
     draw(p5){
-        if (this.handle.state === IO_STATE.DRAGGED){
-            this.moveHandle(p5);
-        }
 
-        // draw light
+        // draw circle for the light
         p5.noStroke();
         p5.fill(this.color);
         p5.circle(this.location.x, this.location.y, this.size);
         p5.noFill();
-        p5.strokeWeight(this.strokeWeight);
-        p5.stroke(this.color);
-        p5.circle(this.location.x, this.location.y, this.size + this.controlOffset);
 
         // draw handle
         this.handle.draw(p5);
 
         // draw beam
-        this.beam.draw(p5);
+        this.beam.draw(p5, this.handle.getDirection(p5));
     }
 
+    /*
+    // Probably not used anymore
     handleOffset(){
         return (this.controlOffset+this.size)/2;
     }
 
+    // Probably not used anymore
     getDirection(p5){
-        const direction = p5.createVector(0,0).set(this.location);
-        direction.sub(this.handle.location);
-        direction.normalize();
-        return direction;
+        this.handle.getDirection(p5);
     }
+    */
 
-    moveHandle(p5, loc){
+    
 
-        if (!loc){
-            loc = mouseV(p5);
-        } 
-
-        // we move the handle in such a way that it resembles
-        // the location of the mouse while dragging;
-        const diff = p5.createVector(0,0).set(this.location).sub(loc);
-        
-        // limit to handleoffset
-        diff.normalize();
-        diff.mult(-this.handleOffset());
-
-        // add to center
-        diff.add(this.location);
-        this.handle.location.set(diff);
-        this.beam.setDirection(this.getDirection(p5), p5);
-    }
 
     // ---- I/O stuff 
     // passing interactions down to the handle member
