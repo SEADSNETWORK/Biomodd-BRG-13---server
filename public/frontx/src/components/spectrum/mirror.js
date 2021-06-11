@@ -16,6 +16,9 @@ class Mirror extends InteractiveObject {
         // generate a random direction and create the handle
         let randDirection = p5.createVector(p5.random(-1, 1), p5.random(-1, 1));
         this.handle = new Handle(this.location, 10, 25, randDirection, this.color, 2);
+
+        // store the normalized vectors used to calculate reflection angles
+        this.reflectionNormals = [null, null];
     }
 
     
@@ -35,6 +38,14 @@ class Mirror extends InteractiveObject {
         endPoint.add(adjust);
         
         return [{x: startPoint.x, y: startPoint.y}, {x: endPoint.x, y: endPoint.y}];
+    }
+
+
+    // gets the point of reflection from light.beam and calculates the normalized vector around which to reflect the beam
+
+    getReflection(p5){
+        // return the direction vector
+        return p5.createVector(this.handle.direction.x, this.handle.direction.y);
     }
 
     
@@ -70,10 +81,21 @@ class Mirror extends InteractiveObject {
 
         // draw the handle
         this.handle.draw(p5);
+
+        // debug: show reflection normals
+        let debug = false;
+        if(debug) {
+            p5.stroke("rgba(0, 255, 255, 1)");
+            for(let i=0; i<this.reflectionNormals.length; i++) {
+                if(this.reflectionNormals[i]!=null) {
+                    p5.line(this.reflectionNormals[i].origin.x, this.reflectionNormals[i].origin.y, this.reflectionNormals[i].vector.x, this.reflectionNormals[i].vector.y);
+                }
+            }
+        }
         
     }
     
-    
+
     // ---- I/O stuff 
     // passing interactions down to the handle member
     mousePressed(p5){

@@ -111,7 +111,8 @@ class Beam {
                 let distance = p5.dist(beamStart.x, beamStart.y, x, y);
                 // save for later
                 if(this.mirrors[i].id!=mirror) {
-                    intersectionPoints.push({x: x, y: y, distance: distance, mirror: this.mirrors[i].id, direction: 0});
+                    let reflectionNormal = this.mirrors[i].getReflection(p5);
+                    intersectionPoints.push({x: x, y: y, distance: distance, mirror: this.mirrors[i].id, direction: 0, reflectionNormal: reflectionNormal});
                 }
             }
             
@@ -127,9 +128,9 @@ class Beam {
                 // check if the one hit has a distance of 0
                 // this means it is a beam that has already reflected and does not hit anything else other than the starting mirror
                 if(intersectionPoints[0].distance==0) {
+                    console.log("no reflection except itself");
                     return false;
                 } else {
-
                     intersectionPoint = intersectionPoints[0];
                 }
             }  else {
@@ -146,10 +147,12 @@ class Beam {
                 
             }
             
-            // calculate angle
-            // NOTE: this will have to be redone when the mirrors can rotate.... worries for later
-            let newDirection = p5.createVector(-direction.x, direction.y);
-            intersectionPoint.direction = newDirection;
+            // calculate angle using P5 reflect function
+            let normDirection = p5.createVector(direction.x, direction.y);
+            let reflectVector = p5.createVector(intersectionPoint.reflectionNormal.x, intersectionPoint.reflectionNormal.y);
+            normDirection.reflect(reflectVector);
+            intersectionPoint.direction = normDirection;
+
             // add to array and return
             this.intersectPoints.push(intersectionPoint);
             return intersectionPoint;
@@ -168,13 +171,13 @@ class Beam {
         this.cast(p5.createVector(-direction.x, -direction.y), this.origin, p5, 0, null);
         
         // this debug flag shows or hide the dots that indicate intersection points on the beam
-        let debug = true;
+        let debug = false;
         if(debug){
             if(this.intersectPoints.length>0) {
                 //console.log("Number of intersection points: "+ this.intersectPoints.length);
                 for(let j=0; j<this.intersectPoints.length; j++) {
                     //console.log(this.intersectPoints[j].distance);
-                    p5.fill(255, 0, 0);
+                    p5.fill("rgb(0, 255, 255)");
                     p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
                 }
             }
