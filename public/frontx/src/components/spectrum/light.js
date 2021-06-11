@@ -23,14 +23,13 @@ import Handle from "./handle.js"
 
 
 class Segment {
-    constructor(p1_x, p1_y, p2_x, p2_y, color, mirror = null, creatorMirror = null){
+    constructor(p1_x, p1_y, p2_x, p2_y, color, mirror){
         this.p1_x = p1_x;
         this.p1_y = p1_y;
         this.p2_x = p2_x;
         this.p2_y = p2_y;
         this.color = color;
         this.mirror = mirror;
-        this.creatorMirror = creatorMirror;
     }
 }
 
@@ -43,10 +42,9 @@ class Beam {
         this.color = color;
         this.segments = [];
         this.mirrors = mirrors;
-        //this.createSegmentZero(p5);
-        //this.createSegment(this.direction, this.origin, mirrors, p5);
 
-        // debug: keep track of calculated intersection points
+        // array to keep track of calculated intersection points
+        // this is mostly for debugging
         this.intersectPoints = [];
     }
 
@@ -62,7 +60,7 @@ class Beam {
     this function creates a beam and then checks if it reflects off a mirror (another new function);
     on reflection it will create a segment, add it to the array and cast a new beam from the reflection point
     */
-    cast(direction, startPoint, p5, cnt){
+    cast(direction, startPoint, p5, cnt, mirror){
         // draw from point of origin in direction
         const beam = p5.createVector(startPoint).set(direction);
         // set the beam length to the diagonal of the sketch so it always reaches the end of the screen
@@ -70,26 +68,26 @@ class Beam {
         beam.add(startPoint);
         
         // check beam for reflection (function)
-        let reflectionData = this.reflect(startPoint, beam, direction, p5);
+        let reflectionData = this.reflect(startPoint, beam, direction, p5, mirror);
         if(reflectionData!==false) {
             // create segment and add to segments array
-            this.segments.push(new Segment(startPoint.x, startPoint.y, reflectionData.x, reflectionData.y, this.color));
+            this.segments.push(new Segment(startPoint.x, startPoint.y, reflectionData.x, reflectionData.y, this.color, mirror));
             // cast new beam from reflectionpoint
             let reflectionStart = p5.createVector(reflectionData.x, reflectionData.y);
             // keep counter to stop excessive recursion
             cnt++;
             if(cnt<1000){
-                this.cast(reflectionData.direction, reflectionStart, p5, cnt);
+                this.cast(reflectionData.direction, reflectionStart, p5, cnt, reflectionData.mirror);
             }
         } else {
             // no reflection has been detected
-            this.segments.push(new Segment(startPoint.x, startPoint.y, beam.x, beam.y, this.color));
+            this.segments.push(new Segment(startPoint.x, startPoint.y, beam.x, beam.y, this.color, mirror));
         }
     }
 
 
 
-    reflect(beamStart, beamEnd, direction, p5){
+    reflect(beamStart, beamEnd, direction, p5, mirror){
 
         let intersectionPoints = [];
 
@@ -112,7 +110,9 @@ class Beam {
                 let y = beamStart.y + t * (beamEnd.y - beamStart.y);
                 let distance = p5.dist(beamStart.x, beamStart.y, x, y);
                 // save for later
-                intersectionPoints.push({x: x, y: y, distance: distance, mirror: i, direction: 0});
+                if(this.mirrors[i].id!=mirror) {
+                    intersectionPoints.push({x: x, y: y, distance: distance, mirror: this.mirrors[i].id, direction: 0});
+                }
             }
             
         }
@@ -145,12 +145,13 @@ class Beam {
                 }
                 
             }
-            let newDirection = p5.createVector(-direction.x, direction.y);
-            intersectionPoint.direction = newDirection;
-            this.intersectPoints.push(intersectionPoint);
             
             // calculate angle
             // NOTE: this will have to be redone when the mirrors can rotate.... worries for later
+            let newDirection = p5.createVector(-direction.x, direction.y);
+            intersectionPoint.direction = newDirection;
+            // add to array and return
+            this.intersectPoints.push(intersectionPoint);
             return intersectionPoint;
         }
         
@@ -164,14 +165,18 @@ class Beam {
         // debug: points of intersection
         this.intersectPoints = [];
         // cast first beam (this starts the population of the segments array)
-        this.cast(p5.createVector(-direction.x, -direction.y), this.origin, p5, 0);
+        this.cast(p5.createVector(-direction.x, -direction.y), this.origin, p5, 0, null);
         
         // this debug flag shows or hide the dots that indicate intersection points on the beam
-        let debug = false;
+        let debug = true;
         if(debug){
-            for(let j=0; j<this.intersectPoints.length; j++) {
-                p5.fill(255, 0, 0);
-                p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
+            if(this.intersectPoints.length>0) {
+                //console.log("Number of intersection points: "+ this.intersectPoints.length);
+                for(let j=0; j<this.intersectPoints.length; j++) {
+                    //console.log(this.intersectPoints[j].distance);
+                    p5.fill(255, 0, 0);
+                    p5.circle(this.intersectPoints[j].x, this.intersectPoints[j].y, 10);
+                }
             }
         }
         
@@ -179,6 +184,7 @@ class Beam {
 
         // loop through and draw segments
         for (let i=0; i<this.segments.length; i++){
+            //console.log(this.segments[i].mirror);
             p5.stroke(this.segments[i].color);
             p5.line(this.segments[i].p1_x, this.segments[i].p1_y, this.segments[i].p2_x, this.segments[i].p2_y);
         }
