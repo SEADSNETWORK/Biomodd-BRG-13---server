@@ -8,16 +8,13 @@ import {distToSegment} from './auxi'
 // Them plants
 
 class Plant extends InteractiveObject {
-    constructor({location, size, color, alternativeColor}){
-        super(location, size);
+    constructor({location, size, color, alternativeColor, ID}){
+        super(location, size, ID);
         this.color = color;
         this.alternativeColor = alternativeColor;
         this.collisionColor = 'red';
         this.colorplaceholder = color;
     }
-
-
-
 
     detectCollision(lights){
         let col = false;

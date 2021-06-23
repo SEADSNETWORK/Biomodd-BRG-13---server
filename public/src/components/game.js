@@ -6,6 +6,7 @@ import Spectrum from '../components/spectrum'
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import Controller from './controller'
 import Countdown from './countdown';
+import Score from './score';
 
 const Game = ()=>{
     const [theme, socket, client, gameSettings, plantClusters, sensorTypes] = useSelector(state => 
@@ -16,9 +17,6 @@ const Game = ()=>{
         state.data.plantClusters,
         state.data.sensorTypes
       ]);
-    // const [gameSettings, setGameSettings] = useState(undefined);
-    const [returnData, setReturnData] = useState(undefined);
-    const [game, setGame] = useState(null);
     const handle = useFullScreenHandle();
     const [start, setStart] = useState(null);
     const gamewidth = 9;
@@ -37,22 +35,14 @@ const Game = ()=>{
       const d = new Date();
       d.setSeconds( d.getSeconds() + seconds);
       setTarget(d)
-      console.log(d);
-      console.log(seconds);
     }
 
-
     useEffect(()=>{
-
-      if (!game && socket){
-        setGame(<Spectrum socket={socket} />)
-      }
 
       if (socket){
         setListeners(true);
         socket.on("/phase", (newphase)=>{
           setPhase(newphase);
-          console.log("setting new phase")
           switch(newphase){
             case PHASES.END:
               setPlayer(null);
@@ -88,7 +78,7 @@ const Game = ()=>{
           setListeners(false);
         }
       }
-    }, [listeners, setListeners, socket, game, setGame, gameSettings])
+    }, [listeners, setListeners, socket, gameSettings])
 
     const go = ()=>{
         setStart(true);
@@ -157,11 +147,9 @@ const Game = ()=>{
             <br/><br/><br/>
             <Countdown target={target} displaytext={"Time before launch"} endText="LETS GO"/>
           </div>
-
-          
           break;
         case PHASES.RUNNING : 
-          return game;
+          return <Spectrum socket={socket} player={player} scoreUpdate={gameSettings.scoreUpdate} />;
           break;
       }
     }
@@ -179,6 +167,9 @@ const Game = ()=>{
             <theme.Empty style={{padding: "0", margin: "0"}}>
               <div style={{width: "100%", height: "100vh"}}> 
                 {(gameSettings)?start?content():content() : null}
+                </div>
+                <div>
+                  <Score socket={socket} />
                 </div>
             </theme.Empty>
           </Col>

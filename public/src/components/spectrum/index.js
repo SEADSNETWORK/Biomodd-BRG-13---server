@@ -10,7 +10,7 @@ import Mirror from "./mirror";
 //      G A M E
 // ===============================
 // ===============================
-export default ({socket}) => {
+export default ({socket, player, mirrorsPerPlayer, safeDistance, scoreUpdate}) => {
 
     // enumerations
 
@@ -77,38 +77,54 @@ export default ({socket}) => {
         }
 
         // create mirrors
-        for (let i = 0; i < mirrorSettings.amount; i++){
-            mirrors[i] = new Mirror({location: getRandomPoint(p5), ...mirrorSettings, id: i}, p5);
-            toDraw.push(mirrors[i]);
-            toInteract.push(mirrors[i]);
-        }
-
-
-        // Create lights
-        //let colors = ["green"];
-        let colors = ["red", "green", "blue"];
-        colors.forEach((color, i)=>{
-            lights.set(color, new Light(
-                {
-                    color, 
-                    location: getPointOnCircle(p5, getCenter(p5), p5.width*lightSettings.offset, 3, i),
-                    ...lightSettings
-            }, mirrors, p5));
-            toDraw.push(lights.get(color));
-            toInteract.push(lights.get(color));
-        })
-
+        
+        
         // create plants
-        for (let i = 0; i < plantSettings.amount; i++){
-            plants[i] = new Plant({location: getRandomPoint(p5), ...plantSettings});
-            toDraw.push(plants[i]);
-            toInteract.push(plants[i]);
-        }
+        // for (let i = 0; i < plantSettings.amount; i++){
+        //     plants[i] = new Plant({location: getRandomPoint(p5), ...plantSettings});
+        //     toDraw.push(plants[i]);
+        //     toInteract.push(plants[i]);
+        // }
 
 
         // setup sockets
-        socket.on("/gameUpdateWorld", (gameWorld)=>{
-            // world = gameWorld;
+        socket.on("/gameUpdate", (gameUpdate)=>{
+            if (plants.length){
+                // update location
+
+            } else {
+                //  instantiate 
+                gameUpdate.plants.forEach((p, i, arr)=>{
+                    plants[i] = new Plant({location: p5.createVector(p.x*p5.width, p.y*p5.height), ID: p.ID,...plantSettings});
+                    toDraw.push(plants[i]);
+                    toInteract.push(plants[i]);
+                });
+            }
+
+            if (mirrors.length){
+                // update
+            } else {
+                gameUpdate.mirrors.forEach((m, i, arr)=>{
+                    mirrors[i] = new Mirror({location: p5.createVector(m.x*p5.width, m.y*p5.height), player: m.player, ID: m.ID,...mirrorSettings}, p5);
+                    toDraw.push(mirrors[i]);
+                    toInteract.push(mirrors[i]);
+                });
+
+                
+
+                let colors = ["red", "green", "blue"];
+                colors.forEach((color, i)=>{
+                    lights.set(color, new Light(
+                        {
+                            color, 
+                            location: getPointOnCircle(p5, getCenter(p5), p5.width*lightSettings.offset, 3, i),
+                            ...lightSettings
+                    }, mirrors, p5));
+                    toDraw.push(lights.get(color));
+                    toInteract.push(lights.get(color));
+                })
+            }
+
         })
 	};
 
@@ -120,6 +136,11 @@ export default ({socket}) => {
 		p5.background(settings.background);
         toDraw.forEach(td=>td.draw(p5));
         plants.forEach(mr=>mr.detectCollision(lights));
+
+        if (p5.frameCount%scoreUpdate == 0){
+            socket.emit("/score", {player, score: p5.frameCount})
+            socket.emit("/giveGameUpdate");
+        }
 	};
 
     // ===============================
