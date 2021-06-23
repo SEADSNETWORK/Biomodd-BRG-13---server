@@ -14,6 +14,8 @@ const database              = require('./src/database').default(settings);
 const cleanup               = require('./src/cleanup').default();
 const gameWorld             = require('./src/setupGameWorld').default(settings.game.resolution);
 let clusterController = null;
+const { nanoid } = require('nanoid')
+
 
 const PHASES = Object.freeze({
     LOAD: "load",
@@ -31,6 +33,17 @@ const players = {
     greens: false,
     blues: false
 }
+
+const state = {
+    score : {},
+    mirrors: [],
+    plants: [],
+    red: 0,
+    green: 0,
+    blue: 0
+}
+
+const scoreHistory = []
 
 // database.connect()
 // .then(({client, list, add, getData, close})=>{
@@ -59,7 +72,6 @@ const players = {
         const updatePhase = (np)=>{
             phase = np;
             io.emit("/phase", np);
-            console.log("sendywendy")
         }
 
         socket.on("/startgame", (player)=>{
@@ -70,6 +82,36 @@ const players = {
             if (phase == PHASES.END){
                 
                 updatePhase(PHASES.LOAD);
+
+                scoreHistory.push(state.score);
+                state.score = {};
+                state.red = 0;
+                state.green = 0;
+                state.blue = 0;
+                state.mirrors = [];
+                state.plants = [];
+
+                for (let index = 0; index < settings.game.mirrorsPerPlayer; index++) {
+                    for (let c = 0; c < 3; c++) {
+                        state.mirrors.push({
+                            player: ["red", "green", "blue"][c],
+                            x: Math.random(),
+                            y: Math.random(),
+                            ID: nanoid()
+                        })   
+                    }
+                }
+
+                for (let index = 0; index < settings.game.plantsAmount; index++) {
+                    state.plants.push({
+                        x: Math.random(),
+                        y: Math.random(),
+                        red: false,
+                        green: false,
+                        blue: false,
+                        ID: nanoid()
+                    })
+                }
 
                 setTimeout(()=>{
                     updatePhase(PHASES.RUNNING);
@@ -84,13 +126,39 @@ const players = {
                     io.emit("/players", players);
                 }, (settings.game.duration + settings.game.beginningTime) * 1000)
             }
-            
-            
+        })
+
+        socket.on("/updatePlant", (np)=>{
+            state.plants.forEach((p, i, arr)=>{
+                if (p.ID == np.ID){
+                    arr[i] = np;
+                }
+            })
+        })
+
+        socket.on("/updateMirror", (nm)=>{
+            state.mirrors.forEach((m, i, arr)=>{
+                if (m.ID == nm.ID){
+                    arr[i] = nm;
+                }
+            })
+        })
+
+        socket.on("/updateLight", (color, rotation)=>{
+            state[color] = rotation;
         })
 
         socket.on("/givePlayers", ()=>{
             socket.emit("players", players);
         });
+
+        socket.on("/giveGameUpdate", ()=>{
+            socket.emit("/gameUpdate", state);
+        })
+
+        socket.on("/score", ({player, score})=>{
+            state.score[player] = score;
+        })
 
         
       });

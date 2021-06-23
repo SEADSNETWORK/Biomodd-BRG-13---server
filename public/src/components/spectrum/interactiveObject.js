@@ -13,10 +13,11 @@ export const IO_STATE = Object.freeze({
 
 export class InteractiveObject {
     
-    constructor(location, size){
+    constructor(location, size, ID){
         this.location = location;
         this.size = size;
         this.state = IO_STATE.UNSELECTED;
+        this.ID = ID;
     }
 
     isOver(loc){

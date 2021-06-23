@@ -18,8 +18,12 @@
         "value"
     ],
     "game" : {
-        "beginningTime": 10,
-        "duration": 20
+        "beginningTime": 1,
+        "duration": 5,
+        "mirrorsPerPlayer": 5,
+        "plantsAmount": 11,
+        "safeDistance": 50,
+        "scoreUpdate": 20
     }, 
     "sensorTypes" : [
         {
