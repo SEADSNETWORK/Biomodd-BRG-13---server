@@ -38,7 +38,7 @@ const players = {
     // list();
 
     const onUpdate = (plantclusters)=>{
-        io.emit("/updateSensors", plantclusters);
+        //io.emit("/updateSensors", plantclusters);
     }
     clusterController = new (require('./src/ClusterController').default)(settings.sensorTypes, settings.plantClusters, onUpdate);
 
@@ -47,6 +47,7 @@ const players = {
      */
     io.on('connection', (socket) => {
         console.log('a user connected');
+        clusterController.connectESP(socket);
         socket.on('disconnect', () => {
           console.log('user disconnected');
         });

@@ -6,7 +6,7 @@ const MODE = Object.freeze({
     "FORCED": 3
 })
 
-const mode = MODE.SIMULATION;
+const mode = MODE.FORCED;//SIMULATION;
 const updateSpeed = 3000;
 const maxAmountOfFailed = 10;
 
@@ -64,6 +64,7 @@ class PlantCluster {
     constructor(_name, _sensors) {
         this.name = _name;
         this.sensors = [];
+        this.connected = false;
         _sensors.forEach(s => {
             this.sensors.push(new Sensor(s.type, s.name))
         })
@@ -86,6 +87,7 @@ class ClusterController {
         this.plantclusters = [];
         this.sensorTypes = [];
         this.onUpdate = _onUpdate;
+        this.socket = null;
 
         _sensorTypes.forEach(st => {
             this.sensorTypes.push(st);
@@ -103,6 +105,35 @@ class ClusterController {
         parent.update();
     }
 
+
+    connectESP(socket){
+        console.log(socket.id, 'new client connected, getting client information.');
+        socket.emit("event", "get_name");
+        socket.on('identifier', (data) => {
+            if (data !== "web_client") {
+                console.log(data);
+
+                let espid = data.espId;
+                for (var i = 0; i< this.plantclusters.length; i++ ){
+                    if (this.plantclusters[i].name === espid){
+                        this.plantclusters[i].connected = true;
+                        this.plantclusters[i].socket = socket;
+                        this.plantclusters[i].socket.on('sensor_data', (data) => {
+
+                            for (var i = 0; i< this.plantclusters.length; i++ ){
+                                if (this.plantclusters[i].name === espid){
+                                    this.plantclusters[i].sensors[0].setValue(data);
+                                    console.log(data);
+                                    console.log(this.plantclusters[i].sensors[0]);}}
+
+                        });
+
+                    }
+                }
+            }
+        });
+    }
+
     update(){
         let newvalues = false;
 
@@ -113,7 +144,7 @@ class ClusterController {
             })
 
         })
-
+/*
         if (newvalues){
             let pc = JSON.stringify(this.plantclusters)
             pc = JSON.parse(pc);
@@ -132,7 +163,7 @@ class ClusterController {
             this.onUpdate(this.plantclusters);
 
         }
-
+*/
     }
 };
 
