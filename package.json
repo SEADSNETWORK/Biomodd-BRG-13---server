@@ -13,6 +13,7 @@
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.25",
     "node": "^16.1.0",
+    "simplex-noise": "^2.4.0",
     "socket.io": "^4.0.1"
   },
   "scripts": {
