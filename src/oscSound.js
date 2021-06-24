@@ -1,6 +1,13 @@
 const { Client }  = require('node-osc');
 
-exports.default = (settings)=>{
+
+
+
+
+
+
+
+
 
 
 class OscSound {
@@ -38,7 +45,10 @@ class OscSound {
 
 }
 
-}
+exports.default = OscSound;
+
+
+
 
 
 

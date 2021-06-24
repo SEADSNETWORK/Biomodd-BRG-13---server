@@ -13,7 +13,7 @@ const logo                  = require('./src/logo').default(config, settings);
 const database              = require('./src/database').default(settings);
 const cleanup               = require('./src/cleanup').default();
 const gameWorld             = require('./src/setupGameWorld').default(settings.game.resolution);
-const OSCSound              = require('./src/oscSound').default(settings);
+const OSCSound              = new (require('./src/oscSound.js').default);
 
 let clusterController = null;
 const { nanoid } = require('nanoid')
@@ -51,12 +51,14 @@ const scoreHistory = []
 // .then(({client, list, add, getData, close})=>{
     // cleanup.init(close);
     // list();
-    const osc = new OSCSound();
-    console.log(plantclusters);
+    //const osc = new OSCSound();
+
     const onUpdate = (plantclusters)=>{
 
 
-    //io.emit("/updateSensors", plantclusters);
+    io.emit("/updateSensors", plantclusters);
+    console.log(plantclusters);
+
     }
     clusterController = new (require('./src/ClusterController').default)(settings.sensorTypes, settings.plantClusters, onUpdate);
 

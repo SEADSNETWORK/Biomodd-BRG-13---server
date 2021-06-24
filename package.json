@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "BIOMODD IS A SEADS PROJECT",
   "engines": {
-    "node": "12.x"
+    "node": "14.x"
   },
   "main": "index.js",
   "dependencies": {
@@ -14,7 +14,7 @@
     "mongoose": "^5.9.25",
     "nanoid": "^3.1.23",
     "node": "^16.1.0",
-    "node-osc": "^6.0.3",
+    "node-osc": "5.x",
     "optional-require": "^1.0.3",
     "simplex-noise": "^2.4.0",
     "socket.io": "^2.0.7"
