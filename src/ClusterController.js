@@ -30,13 +30,17 @@ class Sensor {
         this.counter++;
 
         this.updated = true;
+        
+        _newvalue= JSON.stringify(_newvalue);
         if (this.type === "Humidity") {
             _newvalue = _newvalue.split(",")[0];
-        } else if (this.type === "Temperature") {
+        } else if (this.type === "Temperature") {      // MICROWAVE?????
             _newvalue = _newvalue.split(",")[1];
         }
         _newvalue = parseFloat(_newvalue.split(":")[1]);
         this.value = _newvalue;
+        console.log(this.type, _newvalue);
+        
         if (!untouchFailed) {
             this.failedRequest = 0;
         }
@@ -130,8 +134,8 @@ class ClusterController {
                             for (var i = 0; i< this.plantclusters.length; i++ ){
                                 if (this.plantclusters[i].name === espid){
                                     this.plantclusters[i].sensors[0].setValue(data);
-                                    console.log(data);
-                                    console.log(this.plantclusters[i].sensors[0]);}}
+                                    
+                                }}
 
                         });
 
