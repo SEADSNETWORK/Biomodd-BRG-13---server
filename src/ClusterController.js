@@ -28,8 +28,15 @@ class Sensor {
 
     setValue(_newvalue, untouchFailed) {
         this.counter++;
-        this.value = _newvalue;
+
         this.updated = true;
+        if (this.type === "Humidity") {
+            _newvalue = _newvalue.split(",")[0];
+        } else if (this.type === "Temperature") {
+            _newvalue = _newvalue.split(",")[1];
+        }
+        _newvalue = parseFloat(_newvalue.split(":")[1]);
+        this.value = _newvalue;
         if (!untouchFailed) {
             this.failedRequest = 0;
         }

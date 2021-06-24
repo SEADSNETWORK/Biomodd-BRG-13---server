@@ -14,7 +14,9 @@
     "mongoose": "^5.9.25",
     "nanoid": "^3.1.23",
     "node": "^16.1.0",
+    "node-osc": "6.0.3",
     "optional-require": "^1.0.3",
+    "osc": "2.4.1",
     "simplex-noise": "^2.4.0",
     "socket.io": "^2.0.7"
   },

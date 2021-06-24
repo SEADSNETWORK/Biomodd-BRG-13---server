@@ -13,6 +13,8 @@ const logo                  = require('./src/logo').default(config, settings);
 const database              = require('./src/database').default(settings);
 const cleanup               = require('./src/cleanup').default();
 const gameWorld             = require('./src/setupGameWorld').default(settings.game.resolution);
+
+
 let clusterController = null;
 const { nanoid } = require('nanoid')
 
@@ -55,6 +57,18 @@ const scoreHistory = []
     }
     clusterController = new (require('./src/ClusterController').default)(settings.sensorTypes, settings.plantClusters, onUpdate);
 
+
+/**
+ *
+ *
+ *
+ * OSC Setup
+ */
+
+
+
+
+
     /**
      * SOOCKET SETUP
      */
@@ -78,6 +92,10 @@ const scoreHistory = []
         socket.on("/startgame", (player)=>{
             players[player] = true;
             console.log("starting new game");
+
+
+            // HUE OFF, lights change, soundscape gamemode on
+
             io.emit("/players", players);
 
             if (phase == PHASES.END){

@@ -24,7 +24,9 @@
         "plantsAmount": 11,
         "safeDistance": 50,
         "scoreUpdate": 20
-    }, 
+    },
+
+
     "sensorTypes" : [
         {
             "name" : "Humidity",
