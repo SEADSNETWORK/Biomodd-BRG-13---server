@@ -1,5 +1,8 @@
 const { Client }  = require('node-osc');
 
+exports.default = (settings)=>{
+
+
 class OscSound {
     constructor() {
 
@@ -9,36 +12,33 @@ class OscSound {
 
     }
 
-    send(address, message){
-            this.client.send(address, message, () => {
-                //client.close();
-            });
-        }
+    send(address, message) {
+        this.client.send(address, message, () => {
+            //client.close();
+        });
+    }
 
-    close(){
+    close() {
         this.client.close();
     }
 
 
-    sendSim(){
-        let sendl = ["/winogradsky/0","/winogradsky/1", "/plant/0", "/plant/1", "/plant/2", "/humidity/0"];
+    sendSim() {
+        let sendl = ["/winogradsky/0", "/winogradsky/1", "/plant/0", "/plant/1", "/plant/2", "/humidity/0"];
         // /gamepress/0!!!
         //let r = Math.random();
 
-        for (var i = 0; i < sendl.length;i++){
+        for (var i = 0; i < sendl.length; i++) {
             let r = Math.random();
-            this.send(sendl[i],r);
+            this.send(sendl[i], r);
         }
 
     }
 
 
-
+}
 
 }
 
-
-o = new OscSound();
-o.send("/gameactive/0", true);
 
 
